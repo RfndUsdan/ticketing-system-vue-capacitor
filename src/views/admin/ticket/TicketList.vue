@@ -118,7 +118,7 @@ onMounted(async () => {
                                 <div class="flex items-center">
                                     <!-- PERBAIKAN: Gunakan ternary operator untuk mengecek apakah sudah ada kata http atau belum -->
                                     <img v-if="ticket.user?.avatar" 
-                                        :src="ticket.user.avatar.startsWith('http') ? ticket.user.avatar : `http://127.0.0.1:8000/storage/${ticket.user.avatar}`" 
+                                        :src="ticket.user.avatar.startsWith('http') ? ticket.user.avatar : `http://192.168.1.11:8000/storage/${ticket.user.avatar}`" 
                                         :alt="ticket.user.name" 
                                         class="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm">
                                     

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Apa Kabar</string>
+    <string name="title_activity_main">Apa Kabar</string>
+    <string name="package_name">com.rfndiusdan.apakabar</string>
+    <string name="custom_url_scheme">com.rfndiusdan.apakabar</string>
+</resources>

@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'
 
 const token = Cookies.get('token')
 
-axios.defaults.baseURL = 'http://192.168.1.4:8000/api'
+axios.defaults.baseURL = 'http://192.168.1.11:8000/api'
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 // axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Accept'] = 'application/json'

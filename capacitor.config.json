@@ -1,0 +1,14 @@
+
+{
+  "appId": "com.rfndiusdan.apakabar",
+  "appName": "Apa Kabar",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}
