@@ -1,0 +1,10 @@
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#EFF6FF", "primaryTextColor": "#14213D", "primaryBorderColor": "#2563EB", "lineColor": "#64748B", "fontFamily": "Segoe UI, Arial, sans-serif", "fontSize": "16px"}, "flowchart": {"curve": "basis", "nodeSpacing": 35, "rankSpacing": 45, "padding": 16, "wrappingWidth": 420}}}%%
+flowchart TD
+    A([Pengguna membuka aplikasi Apa Kabar]) --> B[Pengguna melakukan login]
+    B --> C[Memilih menu buat laporan]
+    C --> D[Mengisi detail yang disediakan aplikasi]
+    D --> E[Menambahkan foto melalui kamera/galeri jika perlu]
+    E --> F[Aplikasi mengirim laporan ke Laravel API]
+    F --> G[Server memvalidasi dan menyimpan data tiket]
+    G --> H[Petugas meninjau laporan dan memperbarui status]
+    H --> I([Pelapor membuka daftar/detail untuk memantau status])

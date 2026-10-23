@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tugas_1_Analisis_Kebutuhan_Apa_Kabar</title>
+  <style id="theme-css">
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { background-color: #ffffff; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                   'Helvetica Neue', Arial, sans-serif;
+      font-size: 16px;
+      max-width: 960px; /* matches GitHub / VS Code markdown preview width */
+      margin: 0 auto;
+      padding: 1em 1.5rem 4rem;
+      line-height: 1.7;
+      word-wrap: break-word;
+      color: #24292e;
+      background-color: #ffffff;
+    }
+    h1 { font-size: 2em; border-bottom: 2px solid #e1e4e8; padding-bottom: 0.3em; }
+    h2 { font-size: 1.5em; border-bottom: 1px solid #e1e4e8; padding-bottom: 0.2em; }
+    h3 { font-size: 1.25em; }
+    h1, h2, h3, h4, h5, h6 { margin-top: 1.5em; margin-bottom: 0.5em; scroll-margin-top: 1.5em; }
+    p { margin: 0.8em 0; }
+    a { color: #0366d6; }
+    a:visited { color: #6f42c1; }
+    code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.875em;
+      color: #24292e;
+      background: #f6f8fa;
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+    }
+    pre {
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 1em 1.2em;
+      overflow-x: auto;
+    }
+    pre code { background: none; padding: 0; font-size: 0.875em; }
+    table { border-collapse: collapse; display: block; width: 100%; overflow: auto; margin: 1em 0; word-break: keep-all; }
+    th, td { border: 1px solid #dfe2e5; padding: 0.5em 1em; text-align: left; }
+    th { background: #f6f8fa; font-weight: 600; }
+    tr:nth-child(even) { background: #fafbfc; }
+    blockquote {
+      border-left: 4px solid #dfe2e5;
+      margin: 0.8em 0; /* vertical margin so consecutive blockquotes stay separate, like GitHub */
+      padding: 0.5em 1em;
+      color: #6a737d;
+      background-color: #f6f8fa;
+    }
+    blockquote > :first-child { margin-top: 0; }
+    blockquote > :last-child { margin-bottom: 0; }
+    
+    .markdown-alert {
+      padding: 0.5em 1em;
+      margin: 0.8em 0;
+      border-left: 0.25em solid #0969da;
+      color: inherit;
+    }
+    .markdown-alert > :first-child { margin-top: 0; }
+    .markdown-alert > :last-child { margin-bottom: 0; }
+    .markdown-alert-title {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      line-height: 1;
+      margin-bottom: 0.5em;
+    }
+    .markdown-alert-title .octicon {
+      margin-right: 0.5em;
+      fill: currentColor;
+      overflow: visible;
+      vertical-align: text-bottom;
+    }
+    .markdown-alert-note { border-left-color: #0969da; }
+    .markdown-alert-note > .markdown-alert-title { color: #0969da; }
+    .markdown-alert-tip { border-left-color: #1a7f37; }
+    .markdown-alert-tip > .markdown-alert-title { color: #1a7f37; }
+    .markdown-alert-important { border-left-color: #8250df; }
+    .markdown-alert-important > .markdown-alert-title { color: #8250df; }
+    .markdown-alert-warning { border-left-color: #9a6700; }
+    .markdown-alert-warning > .markdown-alert-title { color: #9a6700; }
+    .markdown-alert-caution { border-left-color: #d1242f; }
+    .markdown-alert-caution > .markdown-alert-title { color: #d1242f; }
+    hr { border: none; border-top: 2px solid #e1e4e8; margin: 2em 0; }
+    img { max-width: 100%; height: auto; }
+    .plantuml-diagram { margin: 1.5em 0; text-align: left; width: fit-content; }
+    .plantuml-diagram svg { height: auto; }
+    .mermaid-diagram { margin: 1.5em 0; text-align: left; width: fit-content; }
+    .mermaid-diagram pre.mermaid { visibility: hidden; overflow: visible; border: none; padding: 0; }
+    .mermaid-diagram svg { visibility: visible; height: auto; }
+    .mermaid-error { visibility: visible; color: #d32f2f; border-left: 3px solid #d32f2f; padding: 0.5em; white-space: pre-wrap; font-size: 0.85em; }
+    .d2-diagram { margin: 1.5em 0; text-align: left; }
+    .d2-diagram svg { height: auto; }
+    .d2-error { color: #d32f2f; border-left: 3px solid #d32f2f; padding: 0.5em; white-space: pre-wrap; font-size: 0.85em; }
+    .katex { color: inherit; }
+    .katex-display { margin: 1em 0; overflow-x: auto; overflow-y: hidden; }
+    body.preview { margin: 0; max-width: none; padding: 1em 26px; }
+    .hljs { background: #f6f8fa; color: #24292e; }
+    .hljs-comment, .hljs-prolog, .hljs-doctype, .hljs-cdata { color: #6a737d; font-style: italic; }
+    .hljs-keyword, .hljs-selector-tag { color: #d73a49; }
+    .hljs-string, .hljs-doctag { color: #032f62; }
+    .hljs-number, .hljs-literal { color: #005cc5; }
+    .hljs-attr, .hljs-attribute { color: #005cc5; }
+    .hljs-name, .hljs-tag, .hljs-selector-id, .hljs-selector-class { color: #22863a; }
+    .hljs-title, .hljs-section, .hljs-function { color: #6f42c1; font-weight: bold; }
+    .hljs-built_in, .hljs-type { color: #e36209; }
+    .hljs-symbol, .hljs-bullet, .hljs-link { color: #0366d6; }
+    .hljs-meta { color: #e36209; }
+    .hljs-addition { background: #e6ffed; color: #22863a; }
+    .hljs-deletion { background: #ffeef0; color: #b31d28; }
+    .hljs-strong { font-weight: bold; }
+    .hljs-emphasis { font-style: italic; }
+    #toc-sidebar { background-color: #ffffff; color: #24292e; }
+    #toc-sidebar::before { background-color: #e1e4e8; }
+    #toc-sidebar .toc-toggle { color: #24292e; }
+    #toc-sidebar a { color: #0366d6; }
+    #toc-sidebar a:hover { background: #f6f8fa; }
+    #toc-sidebar a.active { color: #0366d6; border-left-color: #0366d6; }
+    #nav-toolbar button { color: #24292e; }
+    #nav-toolbar button:hover, #nav-toolbar button.active { background: #f6f8fa; }
+  </style>
+  <style id="katex-css">@font-face{font-display:block;font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_AMS-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Math-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Script-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size1-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size2-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size3-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size4-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;position:relative;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.47"}.katex .katex-mathml{border:0;-webkit-clip-path:inset(50%);clip-path:inset(50%);height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .mathsfit,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .smash{display:inline;line-height:0}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex svg{fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+</style>
+  <style>body{max-width:1024px;margin:0 auto}table{max-width:1024px;table-layout:fixed}table td,table th{word-break:break-word;overflow-wrap:break-word}</style>
+</head>
+<body>
+<!-- NOTE: This ID is also referenced in src/webview/scroll-sync-webview.ts (applyPendingBodyUpdate). -->
+<div id="preview-content">
+<!-- =========================================================================
+     APA KABAR · Tugas 1 · Analisis Kebutuhan & Karakteristik Perangkat Bergerak
+     Format : Markdown + HTML/CSS inline (optimal di VS Code/ekspor HTML;
+              konten tetap terbaca jika renderer membersihkan CSS)
+     Palet  : Navy #14213D · Blue #2563EB · Teal #0F766E · Amber #D97706
+     ========================================================================= -->
+<style>
+  /* Lapisan penyempurnaan. Tampilan dasar memakai inline style agar tetap
+     rapi pada renderer yang membersihkan blok style. */
+  .ak-lift { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .ak-lift:hover { transform: translateY(-3px); box-shadow: 0 16px 30px -22px rgba(15,23,42,.5); border-color: #BFDBFE !important; }
+  .ak-toc a { transition: border-color .16s ease, background .16s ease, transform .16s ease; }
+  .ak-toc a:hover { border-color: #BFDBFE !important; background: #F8FAFC !important; transform: translateY(-2px); }
+  .ak-h2 { scroll-margin-top: 24px; }
+  @media (max-width: 640px) {
+    .ak-hero { padding: 28px 16px 24px !important; }
+    .ak-h2 { font-size: 1.25em !important; }
+  }
+  @media print {
+    .ak-lift:hover, .ak-toc a:hover { transform: none; box-shadow: none; }
+  }
+  /* === Penyesuaian untuk hasil ekspor HTML (ID #preview-content) === */
+  #preview-content { color: #334155; line-height: 1.75; }
+  #preview-content h1, #preview-content h2, #preview-content h3 { color: #14213D; }
+  #preview-content h3 {
+    position: relative;
+    margin-top: 2em;
+    padding-left: 14px;
+    border-left: 4px solid #2563EB;
+    font-size: 1.06em;
+  }
+  #preview-content a { color: #1D4ED8; }
+  #preview-content [id] { scroll-margin-top: 20px; }
+
+  /* Tabel */
+  #preview-content .table-wrap {
+    margin: 18px 0;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #FFFFFF;
+  }
+  #preview-content .table-wrap table {
+    display: table;
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: visible;
+    table-layout: auto;
+    background: #FFFFFF;
+  }
+  #preview-content .table-wrap th,
+  #preview-content .table-wrap td {
+    border: 0;
+    border-top: 1px solid #E2E8F0;
+    padding: 11px 14px;
+    vertical-align: top;
+  }
+  #preview-content .table-wrap thead th {
+    border-top: 0;
+    background: #F1F5F9;
+    color: #14213D;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  #preview-content .table-wrap tbody tr:nth-child(even) { background: #FCFDFE; }
+  #preview-content .table-wrap tbody tr:hover { background: #EFF6FF; }
+  #preview-content .table-wrap tbody td:first-child { color: #14213D; font-weight: 600; }
+
+  /* Diagram: ukuran dibatasi agar flowchart tidak terlalu besar */
+  .mermaid-diagram,
+  #preview-content .mermaid-diagram {
+    width: auto !important;
+    margin: 22px auto !important;
+    text-align: center;
+  }
+  .mermaid-diagram svg,
+  #preview-content .mermaid-diagram svg,
+  pre.mermaid svg {
+    width: 470px !important;
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 0 auto !important;
+  }
+  pre.mermaid { margin: 0 auto; }
+
+  /* Checklist */
+  #preview-content input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    margin-right: 6px;
+    vertical-align: -2px;
+    accent-color: #2563EB;
+  }
+  #preview-content li:has(> input[type="checkbox"]) {
+    list-style: none;
+    margin-left: -1.1em;
+  }
+
+  @media (max-width: 720px) {
+    #preview-content .table-wrap { border-radius: 10px; }
+    #preview-content .table-wrap table { min-width: 560px; }
+    #preview-content .table-wrap th,
+    #preview-content .table-wrap td { padding: 9px 11px; font-size: 13px; }
+    .mermaid-diagram svg,
+    #preview-content .mermaid-diagram svg,
+    pre.mermaid svg { width: 100% !important; }
+  }
+
+  @media print {
+    #preview-content .table-wrap { border-radius: 0; overflow: visible; }
+    #preview-content .table-wrap table { min-width: 0; }
+  }
+</style>
+<div class="ak-hero" style="margin: 0 0 4px; padding: 42px 28px 34px; text-align: center; border: 1px solid #E2E8F0; border-radius: 20px; background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%); box-shadow: 0 26px 50px -42px rgba(15,23,42,.6);">
+  <p style="margin: 0 0 20px;">
+    <img src="logo.png" alt="Logo Apa Kabar" width="150" style="border-radius: 16px;" />
+  </p>
+  <p style="margin: 0 0 18px; font-size: 11px; font-weight: 800; letter-spacing: .18em; color: #2563EB;">
+    DOKUMEN SPESIFIKASI KEBUTUHAN &amp; TARGET APLIKASI
+  </p>
+  <h1 style="margin: 0; padding: 0; border: 0; font-size: 2.6em; line-height: 1.1; letter-spacing: -.02em; color: #14213D;">
+    Apa Kabar
+  </h1>
+  <p style="margin: 14px 0 6px; font-size: 1.15em; font-weight: 600; color: #334155;">
+    Aplikasi Pelaporan Kerusakan Barang &amp; Fasilitas
+  </p>
+  <p style="margin: 0; font-size: .98em; color: #64748B;">
+    Analisis Kebutuhan Pengguna &amp; Karakteristik Perangkat Bergerak
+  </p>
+  <p style="margin: 22px 0 0; line-height: 2;">
+    <span style="display: inline-block; padding: 5px 12px; border: 1px solid #BFDBFE; border-radius: 999px; background: #EFF6FF; color: #1D4ED8; font-size: 10.5px; font-weight: 800; letter-spacing: .1em;">PEMROGRAMAN BERGERAK</span>
+    <span style="display: inline-block; padding: 5px 12px; border: 1px solid #E2E8F0; border-radius: 999px; background: #FFFFFF; color: #475569; font-size: 10.5px; font-weight: 800; letter-spacing: .1em;">TUGAS 1</span>
+    <span style="display: inline-block; padding: 5px 12px; border: 1px solid #E2E8F0; border-radius: 999px; background: #FFFFFF; color: #475569; font-size: 10.5px; font-weight: 800; letter-spacing: .1em;">TA 2026/2027</span>
+  </p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0 0;">
+  <div class="ak-lift" style="flex: 1 1 180px; padding: 14px 16px; border: 1px solid #E2E8F0; border-radius: 12px; background: #FFFFFF;">
+    <p style="margin: 0 0 4px; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #94A3B8;">Mata Kuliah</p>
+    <p style="margin: 0; font-weight: 700; color: #14213D;">Pemrograman Bergerak</p>
+  </div>
+  <div class="ak-lift" style="flex: 1 1 220px; padding: 14px 16px; border: 1px solid #E2E8F0; border-radius: 12px; background: #FFFFFF;">
+    <p style="margin: 0 0 4px; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #94A3B8;">Nama Mahasiswa</p>
+    <p style="margin: 0; font-weight: 700; color: #14213D;">Rifandi Usdan Fanani Putra</p>
+  </div>
+  <div class="ak-lift" style="flex: 1 1 140px; padding: 14px 16px; border: 1px solid #E2E8F0; border-radius: 12px; background: #FFFFFF;">
+    <p style="margin: 0 0 4px; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #94A3B8;">NIM</p>
+    <p style="margin: 0; font-weight: 700; color: #14213D; font-variant-numeric: tabular-nums;">2305101086</p>
+  </div>
+  <div class="ak-lift" style="flex: 1 1 260px; padding: 14px 16px; border: 1px solid #E2E8F0; border-radius: 12px; background: #FFFFFF;">
+    <p style="margin: 0 0 4px; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #94A3B8;">Program Studi / Institusi</p>
+    <p style="margin: 0; font-weight: 700; color: #14213D;">Teknik Informatika / Universitas PGRI Madiun</p>
+  </div>
+</div>
+<div style="display: flex; gap: 12px; margin: 22px 0; padding: 15px 18px; border: 1px solid #FDE68A; border-left: 4px solid #D97706; border-radius: 0 12px 12px 0; background: #FFFBEB;">
+  <div style="flex: none; font-size: 16px; line-height: 1.5;">⚠️</div>
+  <div style="min-width: 0;">
+    <p style="margin: 0 0 4px; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #B45309;">Validitas data</p>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.7; color: #475569;">Dokumen ini merupakan analisis awal berdasarkan fungsi dan arsitektur proyek. Belum ada data wawancara atau observasi lapangan yang diberikan. Pernyataan tentang kondisi proses manual ditandai sebagai hipotesis dan perlu divalidasi.</p>
+  </div>
+</div>
+<h3 id="isi-dokumen">Isi dokumen</h3>
+<div class="ak-toc" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin: 14px 0 0;">
+  <a href="#s01" style="flex: 1 1 220px; display: block; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; text-decoration: none; color: #14213D;">
+    <span style="display: block; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: #2563EB;">01</span>
+    <span style="display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600;">Ringkasan Eksekutif</span>
+  </a>
+  <a href="#s02" style="flex: 1 1 220px; display: block; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; text-decoration: none; color: #14213D;">
+    <span style="display: block; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: #2563EB;">02</span>
+    <span style="display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600;">Latar Belakang &amp; Masalah</span>
+  </a>
+  <a href="#s03" style="flex: 1 1 220px; display: block; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; text-decoration: none; color: #14213D;">
+    <span style="display: block; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: #2563EB;">03</span>
+    <span style="display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600;">Sistem yang Berjalan</span>
+  </a>
+  <a href="#s04" style="flex: 1 1 220px; display: block; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; text-decoration: none; color: #14213D;">
+    <span style="display: block; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: #2563EB;">04</span>
+    <span style="display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600;">Sistem yang Ditawarkan</span>
+  </a>
+  <a href="#s05" style="flex: 1 1 220px; display: block; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; text-decoration: none; color: #14213D;">
+    <span style="display: block; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: #2563EB;">05</span>
+    <span style="display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600;">Kebutuhan Pengguna</span>
+  </a>
+  <a href="#s06" style="flex: 1 1 220px; display: block; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; text-decoration: none; color: #14213D;">
+    <span style="display: block; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: #2563EB;">06</span>
+    <span style="display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600;">Karakteristik Perangkat</span>
+  </a>
+  <a href="#s07" style="flex: 1 1 220px; display: block; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; text-decoration: none; color: #14213D;">
+    <span style="display: block; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: #2563EB;">07</span>
+    <span style="display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600;">Spesifikasi Pengembang</span>
+  </a>
+  <a href="#s08" style="flex: 1 1 220px; display: block; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; text-decoration: none; color: #14213D;">
+    <span style="display: block; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: #2563EB;">08</span>
+    <span style="display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600;">Target &amp; Pengujian</span>
+  </a>
+  <a href="#s09" style="flex: 1 1 220px; display: block; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; text-decoration: none; color: #14213D;">
+    <span style="display: block; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: #2563EB;">09</span>
+    <span style="display: block; margin-top: 2px; font-size: 13.5px; font-weight: 600;">Kesimpulan &amp; Referensi</span>
+  </a>
+</div>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="s01"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-size: .72em; font-weight: 800; letter-spacing: .04em;">01</span>
+  <span>Ringkasan Eksekutif</span>
+</h2>
+<h3 id="mengapa-apa-kabar-relevan-sebagai-solusi-mobile">Mengapa Apa Kabar relevan sebagai solusi mobile?</h3>
+<p>Apa Kabar merupakan aplikasi ticketing untuk membantu pengguna menyampaikan laporan kerusakan barang atau fasilitas, melampirkan bukti foto, serta memantau perkembangan laporan. Dari sisi pengelola, sistem membantu petugas menerima, memeriksa, dan memperbarui status tiket secara lebih terpusat.</p>
+<p>Proyek yang menjadi dasar dokumen ini menggunakan <strong>Vue.js</strong> untuk antarmuka, <strong>Laravel 12</strong> sebagai REST API, <strong>MySQL/MariaDB</strong> sebagai basis data, serta <strong>Capacitor</strong> untuk membungkus aplikasi menjadi aplikasi Android. Fokus dokumen adalah kebutuhan pengguna, alur kerja, karakteristik mobile, dan target yang dapat diuji.</p>
+<h3 id="tujuan-dokumen">Tujuan dokumen</h3>
+<ul>
+<li>Mengidentifikasi pengguna dan kebutuhan utama dalam proses pelaporan kerusakan.</li>
+<li>Membandingkan sistem yang berjalan dengan alur sistem yang ditawarkan.</li>
+<li>Menentukan dampak layar, kamera/galeri, konektivitas, dan keamanan perangkat bergerak.</li>
+<li>Menyusun spesifikasi pengembang serta target fungsional dan nonfungsional yang dapat diuji.</li>
+</ul>
+<div style="display: flex; gap: 12px; margin: 22px 0; padding: 15px 18px; border: 1px solid #BFDBFE; border-left: 4px solid #2563EB; border-radius: 0 12px 12px 0; background: #EFF6FF;">
+  <div style="flex: none; font-size: 16px; line-height: 1.5;">🎯</div>
+  <div style="min-width: 0;">
+    <p style="margin: 0 0 4px; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #1D4ED8;">Ruang lingkup</p>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.7; color: #475569;">Autentikasi, pembuatan laporan, lampiran gambar, daftar/detail tiket, pemantauan status, serta peran pengelola sesuai implementasi yang benar-benar ada.</p>
+  </div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; margin: 24px 0 0;">
+  <div class="ak-lift" style="flex: 1 1 220px; padding: 18px 16px; border: 1px solid #DCE5F0; border-top: 4px solid #2563EB; border-radius: 12px; background: #F8FAFC;">
+    <p style="margin: 0 0 12px; font-size: 11px; font-weight: 800; letter-spacing: .12em; color: #2563EB;">
+      01 / LAPOR
+    </p>
+    <p style="margin: 0 0 10px; font-size: 15px; font-weight: 700; line-height: 1.4; color: #14213D;">
+      Buat laporan terstruktur
+    </p>
+    <p style="margin: 0; font-size: 12.5px; line-height: 1.7; color: #475569;">
+      Formulir membantu mengumpulkan detail dan bukti kerusakan.
+    </p>
+  </div>
+  <div class="ak-lift" style="flex: 1 1 220px; padding: 18px 16px; border: 1px solid #DCE5F0; border-top: 4px solid #0F766E; border-radius: 12px; background: #F8FAFC;">
+    <p style="margin: 0 0 12px; font-size: 11px; font-weight: 800; letter-spacing: .12em; color: #0F766E;">
+      02 / KELOLA
+    </p>
+    <p style="margin: 0 0 10px; font-size: 15px; font-weight: 700; line-height: 1.4; color: #14213D;">
+      Informasi tiket lebih terpusat
+    </p>
+    <p style="margin: 0; font-size: 12.5px; line-height: 1.7; color: #475569;">
+      Data tiket dapat diperiksa sesuai hak akses.
+    </p>
+  </div>
+  <div class="ak-lift" style="flex: 1 1 220px; padding: 18px 16px; border: 1px solid #DCE5F0; border-top: 4px solid #D97706; border-radius: 12px; background: #F8FAFC;">
+    <p style="margin: 0 0 12px; font-size: 11px; font-weight: 800; letter-spacing: .12em; color: #D97706;">
+      03 / PANTAU
+    </p>
+    <p style="margin: 0 0 10px; font-size: 15px; font-weight: 700; line-height: 1.4; color: #14213D;">
+      Cek perkembangan laporan
+    </p>
+    <p style="margin: 0; font-size: 12.5px; line-height: 1.7; color: #475569;">
+      Pelapor melihat status terbaru dari backend.
+    </p>
+  </div>
+</div>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="s02"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-size: .72em; font-weight: 800; letter-spacing: .04em;">02</span>
+  <span>Latar Belakang &amp; Masalah</span>
+</h2>
+<h3 id="mendefinisikan-masalah-sebelum-menentukan-solusi">Mendefinisikan masalah sebelum menentukan solusi</h3>
+<p>Kerusakan barang atau fasilitas membutuhkan proses pelaporan yang jelas agar informasi sampai kepada pihak yang bertanggung jawab dan dapat ditindaklanjuti. Jika laporan disampaikan secara lisan atau lewat pesan yang tersebar, informasi bisa tidak seragam, bukti kerusakan sulit dihimpun, dan pelapor belum tentu memiliki cara terstruktur untuk mengetahui perkembangan penanganan.</p>
+<div style="display: flex; gap: 12px; margin: 22px 0; padding: 15px 18px; border: 1px solid #BFDBFE; border-left: 4px solid #2563EB; border-radius: 0 12px 12px 0; background: #EFF6FF;">
+  <div style="flex: none; font-size: 16px; line-height: 1.5;">📌</div>
+  <div style="min-width: 0;">
+    <p style="margin: 0 0 4px; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #1D4ED8;">Batasan analisis</p>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.7; color: #475569;">Pernyataan tersebut adalah konteks masalah yang perlu dikonfirmasi pada lingkungan penggunaan sebenarnya, bukan hasil observasi yang sudah terukur.</p>
+  </div>
+</div>
+<h3 id="potensi-masalah-yang-dianalisis">Potensi masalah yang dianalisis</h3>
+<table>
+<thead>
+<tr>
+<th>Aspek</th>
+<th>Potensi masalah</th>
+<th>Dampak yang mungkin</th>
+<th>Cara validasi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pelaporan</strong></td>
+<td>Laporan berpotensi masuk lewat beberapa kanal atau lisan.</td>
+<td>Informasi sulit ditelusuri dalam satu tempat.</td>
+<td>Wawancara pelapor dan petugas; amati proses aktual.</td>
+</tr>
+<tr>
+<td><strong>Kelengkapan</strong></td>
+<td>Detail lokasi/kerusakan atau bukti foto mungkin tidak selalu ada.</td>
+<td>Petugas perlu meminta klarifikasi tambahan.</td>
+<td>Tinjau contoh laporan terdahulu dengan izin.</td>
+</tr>
+<tr>
+<td><strong>Status tindak lanjut</strong></td>
+<td>Pelapor mungkin belum dapat melihat status terkini secara mandiri.</td>
+<td>Pertanyaan status berulang dapat terjadi.</td>
+<td>Tanyakan bagaimana status dibagikan saat ini.</td>
+</tr>
+<tr>
+<td><strong>Dokumentasi</strong></td>
+<td>Riwayat laporan berpotensi tersebar pada catatan/pesan.</td>
+<td>Rekap dan pencarian laporan lebih sulit.</td>
+<td>Tinjau media pencatatan yang benar-benar digunakan.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-temuan-yang-harus-dikumpulkan">Data temuan yang harus dikumpulkan</h3>
+<p>Agar tugas memenuhi unsur “data temuan”, lakukan wawancara singkat dengan calon pelapor dan petugas/pengelola. Catat tanggal, peran responden tanpa data sensitif, pertanyaan, jawaban ringkas, dan bukti proses yang diizinkan. Jangan menulis jumlah responden, persentase, atau kesimpulan kuantitatif sebelum data benar-benar diperoleh.</p>
+<table>
+<thead>
+<tr>
+<th>Pertanyaan wawancara</th>
+<th>Catatan jawaban</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Bagaimana laporan kerusakan disampaikan saat ini?</td>
+<td><span style="display: block; height: 18px; border-bottom: 1px dashed #CBD5E1; margin-bottom: 6px;"></span><span style="display: block; height: 18px; border-bottom: 1px dashed #CBD5E1;"></span></td>
+</tr>
+<tr>
+<td>2. Informasi apa yang wajib disertakan?</td>
+<td><span style="display: block; height: 18px; border-bottom: 1px dashed #CBD5E1; margin-bottom: 6px;"></span><span style="display: block; height: 18px; border-bottom: 1px dashed #CBD5E1;"></span></td>
+</tr>
+<tr>
+<td>3. Bagaimana pelapor mengetahui status laporan?</td>
+<td><span style="display: block; height: 18px; border-bottom: 1px dashed #CBD5E1; margin-bottom: 6px;"></span><span style="display: block; height: 18px; border-bottom: 1px dashed #CBD5E1;"></span></td>
+</tr>
+<tr>
+<td>4. Apakah foto dari ponsel dibutuhkan?</td>
+<td><span style="display: block; height: 18px; border-bottom: 1px dashed #CBD5E1; margin-bottom: 6px;"></span><span style="display: block; height: 18px; border-bottom: 1px dashed #CBD5E1;"></span></td>
+</tr>
+</tbody>
+</table>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="s03"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-size: .72em; font-weight: 800; letter-spacing: .04em;">03</span>
+  <span>Sistem yang Berjalan</span>
+</h2>
+<h3 id="hipotesis-alur-pelaporan-sebelum-aplikasi-digunakan">Hipotesis alur pelaporan sebelum aplikasi digunakan</h3>
+<p>Flowchart berikut adalah gambaran awal alur pelaporan manual/tersebar. Revisi setiap langkah berdasarkan praktik nyata di lingkungan kampus atau instansi tempat aplikasi akan digunakan.</p>
+<p class="ak-diagram" style="margin: 22px 0; text-align: center;">
+  <img src="gambar/alur-pelaporan-manual.png" alt="Flowchart alur pelaporan manual sebelum aplikasi digunakan" width="520" style="max-width: 100%; height: auto; border: 1px solid #E2E8F0; border-radius: 12px; background: #FFFFFF; padding: 10px;" />
+</p>
+<h3 id="pertanyaan-analisis-untuk-memeriksa-kelemahan-alur">Pertanyaan analisis untuk memeriksa kelemahan alur</h3>
+<ul>
+<li>Apakah laporan memiliki format informasi yang sama?</li>
+<li>Apakah pelapor menerima nomor atau bukti bahwa laporan sudah diterima?</li>
+<li>Apakah status dan riwayat dapat dilihat tanpa menghubungi petugas?</li>
+<li>Bagaimana foto disimpan dan siapa yang dapat mengaksesnya?</li>
+<li>Bagaimana petugas menentukan prioritas dan mencegah laporan ganda?</li>
+</ul>
+<h3 id="referensi-pembanding">Referensi pembanding</h3>
+<p>SP4N-LAPOR! merupakan contoh layanan pengaduan digital yang menyediakan kanal penyampaian laporan serta informasi tindak lanjut. Referensi ini digunakan sebagai pembanding pola layanan digital, bukan sebagai bukti bahwa proses di kampus memiliki prosedur yang sama.</p>
+<ul>
+<li><a href="https://sp4n.lapor.go.id/">https://sp4n.lapor.go.id/</a></li>
+<li><a href="https://lapor.go.id/faq">https://lapor.go.id/faq</a></li>
+</ul>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="s04"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-size: .72em; font-weight: 800; letter-spacing: .04em;">04</span>
+  <span>Sistem yang Ditawarkan</span>
+</h2>
+<h3 id="pelaporan-mobile-dengan-pencatatan-dan-pemantauan-tiket">Pelaporan mobile dengan pencatatan dan pemantauan tiket</h3>
+<p>Apa Kabar ditawarkan sebagai aplikasi Android untuk mengirim laporan dan memantau perkembangannya. Petugas menggunakan antarmuka pengelolaan yang tersedia untuk memeriksa laporan dan memperbarui status sesuai hak akses.</p>
+<p class="ak-diagram" style="margin: 22px 0; text-align: center;">
+  <img src="gambar/alur-pelaporan-aplikasi.png" alt="Flowchart alur pelaporan melalui aplikasi Apa Kabar" width="460" style="max-width: 100%; height: auto; border: 1px solid #E2E8F0; border-radius: 12px; background: #FFFFFF; padding: 10px;" />
+</p>
+<h3 id="arsitektur-solusi">Arsitektur solusi</h3>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 6px;">
+  <span style="display: inline-block; padding: 6px 12px; border: 1px solid #BFDBFE; border-radius: 8px; background: #EFF6FF; color: #1D4ED8; font-size: 11.5px; font-weight: 700;">Vue.js</span>
+  <span style="display: inline-block; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 8px; background: #F8FAFC; color: #334155; font-size: 11.5px; font-weight: 700;">Vite</span>
+  <span style="display: inline-block; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 8px; background: #F8FAFC; color: #334155; font-size: 11.5px; font-weight: 700;">Capacitor Android</span>
+  <span style="display: inline-block; padding: 6px 12px; border: 1px solid #FECACA; border-radius: 8px; background: #FEF2F2; color: #B91C1C; font-size: 11.5px; font-weight: 700;">Laravel 12</span>
+  <span style="display: inline-block; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 8px; background: #F8FAFC; color: #334155; font-size: 11.5px; font-weight: 700;">MySQL / MariaDB</span>
+  <span style="display: inline-block; padding: 6px 12px; border: 1px solid #E2E8F0; border-radius: 8px; background: #F8FAFC; color: #334155; font-size: 11.5px; font-weight: 700;">REST API + HTTPS</span>
+</div>
+<table>
+<thead>
+<tr>
+<th>Lapisan</th>
+<th>Komponen</th>
+<th>Tanggung jawab</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Mobile UI</strong></td>
+<td>Vue.js + Capacitor</td>
+<td>Login, formulir laporan, daftar/detail tiket, dan interaksi pengguna.</td>
+</tr>
+<tr>
+<td><strong>API</strong></td>
+<td>Laravel 12 REST API</td>
+<td>Autentikasi, validasi, proses bisnis, otorisasi, dan respons data.</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>MySQL/MariaDB</td>
+<td>Menyimpan akun, tiket, status, dan metadata lampiran.</td>
+</tr>
+<tr>
+<td><strong>Berkas</strong></td>
+<td>Storage gambar</td>
+<td>Menyimpan foto secara persisten, idealnya pada layanan object storage atau disk yang sesuai.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="alur-status-tiket-yang-diusulkan">Alur status tiket yang diusulkan</h3>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0 10px;">
+<p><span style="display: inline-block; padding: 8px 14px; border: 1px solid #FDE68A; border-radius: 999px; background: #FFFBEB; color: #B45309; font-size: 12px; font-weight: 700;">● Menunggu</span>
+<span style="color: #94A3B8;">→</span>
+<span style="display: inline-block; padding: 8px 14px; border: 1px solid #BFDBFE; border-radius: 999px; background: #EFF6FF; color: #1D4ED8; font-size: 12px; font-weight: 700;">● Diverifikasi</span>
+<span style="color: #94A3B8;">→</span>
+<span style="display: inline-block; padding: 8px 14px; border: 1px solid #99F6E4; border-radius: 999px; background: #F0FDFA; color: #0F766E; font-size: 12px; font-weight: 700;">● Diproses</span>
+<span style="color: #94A3B8;">→</span>
+<span style="display: inline-block; padding: 8px 14px; border: 1px solid #BBF7D0; border-radius: 999px; background: #F0FDF4; color: #15803D; font-size: 12px; font-weight: 700;">● Selesai</span>
+<span style="color: #94A3B8;">/</span>
+<span style="display: inline-block; padding: 8px 14px; border: 1px solid #FECACA; border-radius: 999px; background: #FEF2F2; color: #B91C1C; font-size: 12px; font-weight: 700;">● Ditolak</span></p>
+</div>
+<div style="display: flex; gap: 12px; margin: 22px 0; padding: 15px 18px; border: 1px solid #BFDBFE; border-left: 4px solid #2563EB; border-radius: 0 12px 12px 0; background: #EFF6FF;">
+  <div style="flex: none; font-size: 16px; line-height: 1.5;">ℹ️</div>
+  <div style="min-width: 0;">
+    <p style="margin: 0 0 4px; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #1D4ED8;">Catatan</p>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.7; color: #475569;">Nama status di atas adalah usulan untuk menggambarkan alur. Sesuaikan dengan nilai enum/kolom status yang benar-benar ada pada repository sebelum dipakai sebagai spesifikasi final.</p>
+  </div>
+</div>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="s05"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-size: .72em; font-weight: 800; letter-spacing: .04em;">05</span>
+  <span>Kebutuhan Pengguna</span>
+</h2>
+<h3 id="dari-peran-pengguna-ke-kebutuhan-yang-dapat-diuji">Dari peran pengguna ke kebutuhan yang dapat diuji</h3>
+<table>
+<thead>
+<tr>
+<th>Pengguna</th>
+<th>Tujuan</th>
+<th>Kebutuhan utama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pelapor</strong><br /><span style="font-size: 12px; color: #64748B;">mahasiswa / pengguna fasilitas</span></td>
+<td>Melaporkan kerusakan dan mengetahui perkembangan.</td>
+<td>Login; formulir yang mudah; unggah foto; daftar/detail tiket; status yang jelas.</td>
+</tr>
+<tr>
+<td><strong>Petugas</strong><br /><span style="font-size: 12px; color: #64748B;">admin pengelola</span></td>
+<td>Memeriksa laporan dan mengatur tindak lanjut.</td>
+<td>Melihat tiket dan lampiran; memperbarui status; mengelola data sesuai kewenangan.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="kebutuhan-fungsional">Kebutuhan fungsional</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Kebutuhan</th>
+<th>Prioritas</th>
+<th>Kriteria penerimaan awal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span style="white-space: nowrap; font-weight: 700;">KF-01</span></td>
+<td>Login dan logout pengguna.</td>
+<td><span style="display: inline-block; padding: 3px 9px; border: 1px solid #FECACA; border-radius: 999px; background: #FEF2F2; color: #B91C1C; font-size: 10.5px; font-weight: 800;">TINGGI</span></td>
+<td>Kredensial valid membuka sesi; kredensial salah menghasilkan pesan yang jelas.</td>
+</tr>
+<tr>
+<td><span style="white-space: nowrap; font-weight: 700;">KF-02</span></td>
+<td>Membuat tiket/laporan.</td>
+<td><span style="display: inline-block; padding: 3px 9px; border: 1px solid #FECACA; border-radius: 999px; background: #FEF2F2; color: #B91C1C; font-size: 10.5px; font-weight: 800;">TINGGI</span></td>
+<td>Field wajib divalidasi; laporan yang berhasil tersimpan muncul pada daftar/detail.</td>
+</tr>
+<tr>
+<td><span style="white-space: nowrap; font-weight: 700;">KF-03</span></td>
+<td>Menambahkan foto bukti.</td>
+<td><span style="display: inline-block; padding: 3px 9px; border: 1px solid #FECACA; border-radius: 999px; background: #FEF2F2; color: #B91C1C; font-size: 10.5px; font-weight: 800;">TINGGI</span></td>
+<td>Jenis dan ukuran file divalidasi; foto dapat dilihat kembali setelah terkirim.</td>
+</tr>
+<tr>
+<td><span style="white-space: nowrap; font-weight: 700;">KF-04</span></td>
+<td>Melihat daftar dan detail tiket.</td>
+<td><span style="display: inline-block; padding: 3px 9px; border: 1px solid #FECACA; border-radius: 999px; background: #FEF2F2; color: #B91C1C; font-size: 10.5px; font-weight: 800;">TINGGI</span></td>
+<td>Data sesuai akun dan izin akses pengguna.</td>
+</tr>
+<tr>
+<td><span style="white-space: nowrap; font-weight: 700;">KF-05</span></td>
+<td>Memantau status tiket.</td>
+<td><span style="display: inline-block; padding: 3px 9px; border: 1px solid #FECACA; border-radius: 999px; background: #FEF2F2; color: #B91C1C; font-size: 10.5px; font-weight: 800;">TINGGI</span></td>
+<td>Status mengikuti nilai terakhir dari server.</td>
+</tr>
+<tr>
+<td><span style="white-space: nowrap; font-weight: 700;">KF-06</span></td>
+<td>Petugas meninjau tiket dan memperbarui status.</td>
+<td><span style="display: inline-block; padding: 3px 9px; border: 1px solid #FECACA; border-radius: 999px; background: #FEF2F2; color: #B91C1C; font-size: 10.5px; font-weight: 800;">TINGGI</span></td>
+<td>Perubahan tersimpan dan terlihat oleh pelapor yang berwenang.</td>
+</tr>
+</tbody>
+</table>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="s06"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-size: .72em; font-weight: 800; letter-spacing: .04em;">06</span>
+  <span>Karakteristik Perangkat Bergerak</span>
+</h2>
+<h3 id="desain-harus-sesuai-dengan-cara-orang-menggunakan-ponsel">Desain harus sesuai dengan cara orang menggunakan ponsel</h3>
+<p>Pelaporan bisa dilakukan langsung di lokasi kejadian. Karena itu, antarmuka perlu mudah digunakan pada layar berbeda dan tetap memberi umpan balik ketika jaringan lambat atau gagal. Panduan Android menekankan tata letak adaptif dan pemisahan tanggung jawab UI serta data [1][2].</p>
+<table>
+<thead>
+<tr>
+<th>Karakteristik</th>
+<th>Implikasi pada Apa Kabar</th>
+<th>Kebutuhan desain / pengujian</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Layar dan ukuran beragam</strong></td>
+<td>Formulir dan teks harus terbaca tanpa terpotong.</td>
+<td>Uji beberapa ukuran layar; label jelas dan tombol mudah disentuh.</td>
+</tr>
+<tr>
+<td><strong>Kamera dan galeri</strong></td>
+<td>Pengguna memerlukan bukti visual kerusakan.</td>
+<td>Uji izin akses, pemilihan gambar, preview, ukuran file, dan pesan gagal.</td>
+</tr>
+<tr>
+<td><strong>Koneksi berubah-ubah</strong></td>
+<td>Request API dapat gagal atau lambat.</td>
+<td>Tampilkan loading/error; cegah submit ganda; sediakan coba lagi; konfirmasi sukses hanya setelah respons server.</td>
+</tr>
+<tr>
+<td><strong>Siklus aplikasi</strong></td>
+<td>OS dapat menghentikan proses aplikasi.</td>
+<td>Muat ulang status dari API; jangan mengandalkan memori layar untuk data penting.</td>
+</tr>
+<tr>
+<td><strong>Keamanan dan privasi</strong></td>
+<td>Foto dan isi laporan dapat bersifat sensitif.</td>
+<td>Gunakan HTTPS, otorisasi backend, hindari token di log, dan batasi akses file.</td>
+</tr>
+<tr>
+<td><strong>Data dan baterai</strong></td>
+<td>Foto besar bisa memperlambat unggahan.</td>
+<td>Batasi ukuran foto dan hindari request berulang yang tidak perlu.</td>
+</tr>
+</tbody>
+</table>
+<div style="display: flex; gap: 12px; margin: 22px 0; padding: 15px 18px; border: 1px solid #FDE68A; border-left: 4px solid #D97706; border-radius: 0 12px 12px 0; background: #FFFBEB;">
+  <div style="flex: none; font-size: 16px; line-height: 1.5;">⚠️</div>
+  <div style="min-width: 0;">
+    <p style="margin: 0 0 4px; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #B45309;">Batasan yang perlu diverifikasi</p>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.7; color: #475569;">Capacitor membungkus frontend Vue menjadi aplikasi Android, tetapi kemampuan native tertentu tetap bergantung pada konfigurasi dan plugin. Notifikasi push, kamera native, atau mode offline tidak boleh dinyatakan sudah tersedia hanya karena perangkat Android mendukungnya.</p>
+  </div>
+</div>
+<h3 id="prinsip-ux-umpan-balik-tiga-keadaan">Prinsip UX: umpan balik tiga keadaan</h3>
+<p>Beri umpan balik yang jelas pada tiga keadaan utama: <strong>sedang mengirim, berhasil terkirim, dan gagal terkirim</strong>. Ini mengurangi kebingungan serta risiko pengiriman laporan berulang.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0;">
+  <div style="flex: 1 1 180px; padding: 14px 16px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF;">
+    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 800; letter-spacing: .12em; color: #1D4ED8;">SEDANG MENGIRIM</p>
+    <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.6;">Tampilkan progres dan nonaktifkan tombol kirim.</p>
+  </div>
+  <div style="flex: 1 1 180px; padding: 14px 16px; border: 1px solid #BBF7D0; border-radius: 12px; background: #F0FDF4;">
+    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 800; letter-spacing: .12em; color: #15803D;">BERHASIL TERKIRIM</p>
+    <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.6;">Konfirmasi hanya setelah server merespons sukses.</p>
+  </div>
+  <div style="flex: 1 1 180px; padding: 14px 16px; border: 1px solid #FECACA; border-radius: 12px; background: #FEF2F2;">
+    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 800; letter-spacing: .12em; color: #B91C1C;">GAGAL TERKIRIM</p>
+    <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.6;">Jelaskan penyebab dan sediakan tombol coba lagi.</p>
+  </div>
+</div>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="s07"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-size: .72em; font-weight: 800; letter-spacing: .04em;">07</span>
+  <span>Spesifikasi Pengembang</span>
+</h2>
+<h3 id="komponen-teknis-untuk-membangun-dan-memelihara-aplikasi">Komponen teknis untuk membangun dan memelihara aplikasi</h3>
+<p>Spesifikasi pengembang merangkum kebutuhan perangkat lunak dan layanan yang digunakan untuk membangun, menjalankan, menguji, serta memelihara Apa Kabar.</p>
+<table>
+<thead>
+<tr>
+<th>Komponen</th>
+<th>Spesifikasi</th>
+<th>Peran</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Frontend</strong></td>
+<td>Vue.js + Vite</td>
+<td>Membangun antarmuka dan mengirim request ke REST API.</td>
+</tr>
+<tr>
+<td><strong>Mobile wrapper</strong></td>
+<td>Capacitor Android</td>
+<td>Mengemas frontend sebagai aplikasi Android untuk pengujian pada perangkat fisik.</td>
+</tr>
+<tr>
+<td><strong>Backend</strong></td>
+<td>Laravel 12 + PHP</td>
+<td>Menangani autentikasi, validasi, proses tiket, dan respons API.</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>MySQL/MariaDB</td>
+<td>Menyimpan akun, tiket, status, dan metadata lampiran.</td>
+</tr>
+<tr>
+<td><strong>Tools pengembangan</strong></td>
+<td>VS Code, Node.js/npm, Composer, PHP, Android Studio, Git/GitHub</td>
+<td>Mendukung build frontend/backend, pengujian Android, dan version control.</td>
+</tr>
+<tr>
+<td><strong>Pengujian</strong></td>
+<td>HP Android fisik + backend aktif</td>
+<td>Menguji login, tiket, detail, status, gambar, jaringan, dan hak akses.</td>
+</tr>
+<tr>
+<td><strong>Deployment</strong></td>
+<td>API HTTPS + storage persisten</td>
+<td>Memberi URL yang dapat diakses lintas jaringan; menjaga ketersediaan file gambar.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="prasyarat-operasional">Prasyarat operasional</h3>
+<ul>
+<li>Repository frontend/backend teridentifikasi dengan jelas dan rahasia tidak disimpan di Git.</li>
+<li>URL API dikelola melalui konfigurasi environment, bukan tersebar di banyak file.</li>
+<li>Skema database dapat direproduksi melalui migration dan memiliki backup sebelum perubahan data.</li>
+<li>Storage foto tetap tersedia setelah deployment ulang.</li>
+<li>Build Android diuji kembali setelah perubahan URL API atau konfigurasi Capacitor.</li>
+</ul>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="s08"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-size: .72em; font-weight: 800; letter-spacing: .04em;">08</span>
+  <span>Spesifikasi Target &amp; Pengujian</span>
+</h2>
+<h3 id="definisi-keberhasilan-yang-bisa-dibuktikan">Definisi keberhasilan yang bisa dibuktikan</h3>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Indikator berhasil</th>
+<th>Cara verifikasi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pelaporan terstruktur</strong></td>
+<td>Pengguna mengisi field wajib dan mengirim tiket dengan respons yang jelas.</td>
+<td>Uji data valid/tidak valid dan cek data tersimpan.</td>
+</tr>
+<tr>
+<td><strong>Lampiran bukti</strong></td>
+<td>Foto dapat dilihat kembali setelah aplikasi ditutup dan dibuka.</td>
+<td>Uji unggah, buka detail, restart aplikasi, cek persistence.</td>
+</tr>
+<tr>
+<td><strong>Pelacakan status</strong></td>
+<td>Daftar/detail menunjukkan status terbaru dari server.</td>
+<td>Ubah status melalui peran petugas, lalu verifikasi dari akun pelapor.</td>
+</tr>
+<tr>
+<td><strong>Kesesuaian mobile</strong></td>
+<td>Layar tidak terpotong dan kontrol utama dapat digunakan.</td>
+<td>Uji pada perangkat dengan ukuran layar yang tersedia.</td>
+</tr>
+<tr>
+<td><strong>Koneksi dan error</strong></td>
+<td>Kegagalan jaringan tidak menghasilkan konfirmasi sukses palsu.</td>
+<td>Putuskan jaringan saat request, lalu pulihkan dan coba ulang.</td>
+</tr>
+<tr>
+<td><strong>Keamanan akses</strong></td>
+<td>Pengguna hanya mengakses data sesuai otorisasinya.</td>
+<td>Uji token tidak valid dan akses ke tiket pengguna lain.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="target-nonfungsional-awal">Target nonfungsional awal</h3>
+<table>
+<thead>
+<tr>
+<th>Aspek</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Usability</strong></td>
+<td>Alur membuat laporan singkat; instruksi dan validasi mudah dipahami.</td>
+</tr>
+<tr>
+<td><strong>Reliability</strong></td>
+<td>Status loading, sukses, dan gagal ditampilkan secara eksplisit.</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>HTTPS pada produksi, validasi server-side, dan kontrol akses.</td>
+</tr>
+<tr>
+<td><strong>Maintainability</strong></td>
+<td>URL API dan rahasia dipisahkan dari source code.</td>
+</tr>
+</tbody>
+</table>
+<div style="display: flex; gap: 12px; margin: 22px 0; padding: 15px 18px; border: 1px solid #BBF7D0; border-left: 4px solid #15803D; border-radius: 0 12px 12px 0; background: #F0FDF4;">
+  <div style="flex: none; font-size: 16px; line-height: 1.5;">📝</div>
+  <div style="min-width: 0;">
+    <p style="margin: 0 0 4px; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #15803D;">Lengkapi dengan data nyata</p>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.7; color: #475569;">Tambahkan hasil wawancara/observasi aktual, tanggal, peran responden, dan ringkasan jawaban. Hindari nama lengkap atau informasi pribadi jika tidak diperlukan. Jika belum ada data, nyatakan bahwa validasi lapangan masih menjadi pekerjaan lanjutan.</p>
+  </div>
+</div>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="s09"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #BFDBFE; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-size: .72em; font-weight: 800; letter-spacing: .04em;">09</span>
+  <span>Kesimpulan &amp; Referensi</span>
+</h2>
+<h3 id="kesimpulan">Kesimpulan</h3>
+<p>Apa Kabar relevan sebagai aplikasi bergerak karena proses pelaporan kerusakan dapat membutuhkan input dan bukti visual langsung dari lokasi. Solusi mobile berpotensi memusatkan data, mempermudah pelampiran bukti, dan membantu pelacakan status—dengan syarat kebutuhan ini divalidasi terhadap pengguna sebenarnya.</p>
+<p>Keberhasilan tidak hanya ditentukan oleh tampilan Android. Backend perlu dapat diakses secara aman, otorisasi harus benar, dan foto laporan harus disimpan secara persisten. Pengujian pada perangkat nyata serta kondisi jaringan yang beragam merupakan bagian penting dari pemenuhan kebutuhan mobile.</p>
+<div style="margin: 26px 0; padding: 22px 24px; border: 1px solid #BFDBFE; border-left: 4px solid #2563EB; border-radius: 0 14px 14px 0; background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%);">
+  <p style="margin: 0; font-size: 15.5px; font-style: italic; line-height: 1.75; color: #14213D;">“Aplikasi mobile yang baik bukan hanya memindahkan formulir ke ponsel — aplikasi harus membantu pengguna mengirim informasi dengan jelas, aman, dan dapat ditindaklanjuti.”</p>
+</div>
+<h3 id="referensi">Referensi</h3>
+<ol>
+<li>Android Developers. “Guide to app architecture.” <a href="https://developer.android.com/topic/architecture">https://developer.android.com/topic/architecture</a></li>
+<li>Android Developers. “Adapt layouts.” <a href="https://developer.android.com/design/ui/mobile/guides/layout-and-content/adapt-layout">https://developer.android.com/design/ui/mobile/guides/layout-and-content/adapt-layout</a></li>
+<li>Android Developers. “Responsive and adaptive design with Views.” <a href="https://developer.android.com/develop/ui/views/layout/responsive-adaptive-design-with-views">https://developer.android.com/develop/ui/views/layout/responsive-adaptive-design-with-views</a></li>
+<li>SP4N-LAPOR! “Layanan Aspirasi dan Pengaduan Online Rakyat.” <a href="https://sp4n.lapor.go.id/">https://sp4n.lapor.go.id/</a></li>
+<li>LAPOR! “Pertanyaan Seputar LAPOR!” <a href="https://lapor.go.id/faq">https://lapor.go.id/faq</a></li>
+<li>Laravel. “Laravel 12.x Documentation.” <a href="https://laravel.com/docs/12.x">https://laravel.com/docs/12.x</a></li>
+<li>Capacitor. “Documentation.” <a href="https://capacitorjs.com/docs">https://capacitorjs.com/docs</a></li>
+</ol>
+<hr class="ak-rule" style="border: 0; height: 1px; background: #E2E8F0; margin: 40px 0;" />
+<p><a id="checklist"></a></p>
+<h2 class="ak-h2" style="display: flex; align-items: center; gap: 14px; margin: 8px 0 22px; padding-bottom: 12px; border: 0; border-bottom: 2px solid #E2E8F0; font-size: 1.55em; color: #14213D;">
+  <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 46px; padding: 0 10px; border: 1px solid #FDE68A; border-radius: 12px; background: #FFFBEB; color: #B45309; font-size: .72em; font-weight: 800; letter-spacing: .04em;">✓</span>
+  <span>Checklist sebelum pengumpulan</span>
+</h2>
+<ul>
+<li>[ ] Isi nama, NIM, mata kuliah, dan identitas kampus.</li>
+<li>[ ] Cocokkan flowchart dengan proses sebenarnya.</li>
+<li>[ ] Tambahkan data wawancara/observasi aktual.</li>
+<li>[ ] Verifikasi setiap fitur terhadap repository Apa Kabar.</li>
+<li>[ ] Konsisten menggunakan istilah pelapor, petugas, tiket, dan status.</li>
+</ul>
+<div style="margin: 36px 0 0; padding: 24px 20px; text-align: center; border: 1px solid #E2E8F0; border-radius: 16px; background: #F8FAFC;">
+  <p style="margin: 0 0 6px; font-weight: 700; color: #14213D;">
+    Apa Kabar · Dokumen Tugas 1
+  </p>
+  <p style="margin: 0; font-size: 12.5px; color: #64748B;">
+    Pemrograman Bergerak · Teknik Informatika · Universitas PGRI Madiun · 2026/2027
+  </p>
+</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:false,theme:'default'});window.__renderMermaid=async function(){var prefix='m'+Date.now()+'_';var scale=0.8;var els=document.querySelectorAll('pre.mermaid');for(var i=0;i<els.length;i++){var el=els[i];try{var r=await mermaid.render(prefix+i,el.textContent||'');el.innerHTML=r.svg}catch(e){var msg=(e.message||String(e)).replace(/</g,'&lt;').replace(/>/g,'&gt;');el.innerHTML='<div class="mermaid-error">'+msg+'</div>'}/* Remove temp divs mermaid leaves on body (not cleaned up on error) */document.querySelectorAll('body>[id^="d'+prefix+'"]').forEach(function(x){x.remove()});if(scale>0){var svg=el.querySelector('svg');if(svg){var mw=svg.style.maxWidth;var natW=mw?parseFloat(mw):parseFloat(svg.getAttribute('width'));if(!isNaN(natW)){svg.setAttribute('width',(natW*scale)+'px');svg.style.maxWidth='none';svg.removeAttribute('height');svg.style.height='auto'}}}el.style.visibility='visible'}};window.__renderMermaidDone=window.__renderMermaid();</script>
+
+</body>
+</html>
