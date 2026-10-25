@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+*.log
+
+# Prisma Client dibuat ulang dengan `npm run prisma:generate`
+src/generated/
+
+# File upload jangan masuk git
+storage/tickets/*
+!storage/tickets/.gitkeep
+storage/avatars/*
+!storage/avatars/.gitkeep

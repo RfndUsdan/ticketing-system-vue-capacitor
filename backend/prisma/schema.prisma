@@ -1,0 +1,77 @@
+// Schema ini adalah kontrak data untuk backend baru.
+// Nilai status/priority sengaja memakai String (bukan enum Prisma) agar mudah
+// diselaraskan dengan API frontend yang sudah berjalan.
+// Nilai yang valid:
+//   status   : open | in_progress | resolved | rejected
+//   priority : low | medium | high (input "normal" dinormalisasi ke "medium")
+//   role     : user | admin
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  nim       String?  @unique
+  role      String   @default("user")
+  avatar    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tickets Ticket[]      @relation("TicketReporter")
+  replies TicketReply[]
+
+  @@map("users")
+}
+
+model Ticket {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  userId      Int       @map("user_id")
+  title       String
+  category    String    @default("Lainnya")
+  priority    String    @default("medium")
+  description String    @db.Text
+  image       String?
+  status      String    @default("open")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  reporter User          @relation("TicketReporter", fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  replies  TicketReply[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
+  @@index([userId])
+  @@index([deletedAt])
+  @@map("tickets")
+}
+
+model TicketReply {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int      @map("ticket_id")
+  userId    Int      @map("user_id")
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([ticketId])
+  @@index([userId])
+  @@map("ticket_replies")
+}

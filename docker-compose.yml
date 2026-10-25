@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: apakabar-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: apakabar
+      POSTGRES_USER: apakabar
+      POSTGRES_PASSWORD: apakabar_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - apakabar_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apakabar -d apakabar"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  apakabar_pgdata:

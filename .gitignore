@@ -28,3 +28,11 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Backend
+backend/.env
+backend/src/generated
+backend/storage/tickets/*
+!backend/storage/tickets/.gitkeep
+backend/storage/avatars/*
+!backend/storage/avatars/.gitkeep

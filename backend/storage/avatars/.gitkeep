@@ -1,0 +1,4 @@
+/**
+ * Folder ini menyimpan avatar user (development).
+ * Di produksi, ganti ke object storage (S3/R2) dan sesuaikan serializer.
+ */
