@@ -56,3 +56,17 @@ export const updateProfileSchema = z.object({
   password: optionalPassword,
   nim: z.string().trim().min(1, 'NIM wajib diisi.').max(20, 'NIM maksimal 20 karakter.'),
 })
+
+export const listUsersQuerySchema = z.object({
+  search: z.string().trim().optional(),
+  role: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.enum(USER_ROLES).optional(),
+  ),
+  page: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.coerce.number().int().min(1).default(1),
+  ),
+})
+
+export type ListUsersQuery = z.infer<typeof listUsersQuerySchema>

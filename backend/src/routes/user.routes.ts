@@ -9,13 +9,17 @@ import {
 import { authenticate, requireAdmin } from '../middlewares/auth.js'
 import { uploadAvatar } from '../middlewares/upload.js'
 import { validate } from '../middlewares/validate.js'
-import { createUserSchema, updateUserSchema } from '../validators/user.validator.js'
+import {
+  createUserSchema,
+  listUsersQuerySchema,
+  updateUserSchema,
+} from '../validators/user.validator.js'
 
 const router = Router()
 
 router.use(authenticate, requireAdmin)
 
-router.get('/', listUsers)
+router.get('/', validate(listUsersQuerySchema, 'query'), listUsers)
 router.post('/', uploadAvatar, validate(createUserSchema), createUser)
 router.get('/:id', getUser)
 // POST dipertahankan untuk kompatibilitas multipart frontend; spec menyediakan PUT/PATCH.

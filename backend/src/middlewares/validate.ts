@@ -1,3 +1,4 @@
+import fs from 'node:fs/promises'
 import type { NextFunction, Request, Response } from 'express'
 import type { ZodType } from 'zod'
 
@@ -21,6 +22,8 @@ export function validate(schema: ZodType, source: ValidationSource = 'body') {
       next()
       return
     }
+
+    if (req.file) void fs.unlink(req.file.path).catch(() => undefined)
 
     const errors: Record<string, string[]> = {}
     for (const issue of result.error.issues) {

@@ -23,7 +23,8 @@ const replyContentSchema = z.string().trim().min(1, 'Jawaban wajib diisi.')
 
 export const createReplySchema = z.object({
   content: replyContentSchema,
-  status: z.enum(TICKET_STATUSES).optional(),
+  // Status dari user tidak dipakai oleh controller; pertahankan toleransi payload.
+  status: z.unknown().optional(),
 })
 
 export const createAdminReplySchema = z.object({
@@ -43,4 +44,18 @@ export const listTicketsQuerySchema = z.object({
     (value) => (value === 'normal' ? 'medium' : value),
     z.string().optional(),
   ),
+  date: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.enum(['today', 'week', 'month']).optional(),
+  ),
+  page: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.coerce.number().int().min(1).optional(),
+  ),
+  per_page: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.coerce.number().int().min(1).max(100).optional(),
+  ),
 })
+
+export type TicketListQuery = z.infer<typeof listTicketsQuerySchema>

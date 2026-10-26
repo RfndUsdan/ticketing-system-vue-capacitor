@@ -2,12 +2,11 @@
 
 REST API untuk aplikasi **Apa Kabar** menggunakan **Node.js + Express 5 + TypeScript + Prisma 7 + PostgreSQL**.
 
-> **Status: scaffold.**
+> **Status: backend inti bertahap.**
 > Frontend **belum diintegrasikan** ke backend ini. Yang sudah berfungsi:
 > `GET /api/health`, `POST /api/register` (termasuk avatar), `POST /api/login`, `GET /api/me`,
-> `POST /api/logout`, middleware JWT, validasi, upload, CORS, dan error handler.
-> Endpoint tiket, user, profil, dan dashboard masih mengembalikan **501** dan
-> sengaja disiapkan sebagai TODO untuk tahap implementasi berikutnya.
+> `POST /api/logout`, serta list/detail/create tiket dengan auth, ownership, filter, dan pagination opsional.
+> Seluruh route tiket, user, profil, dan dashboard pada tabel endpoint sudah memiliki implementasi.
 
 ---
 
@@ -41,7 +40,7 @@ backend/
 │   ├── config/
 │   │   ├── env.ts           # validasi environment dengan Zod
 │   │   └── prisma.ts        # Prisma Client + adapter-pg
-│   ├── controllers/         # auth sudah jalan; sisanya stub
+│   ├── controllers/         # implementasi endpoint API
 │   ├── middlewares/         # auth, validate, upload, error
 │   ├── routes/              # kontrak endpoint
 │   ├── types/               # augmentasi Request.user
@@ -76,7 +75,7 @@ npm run db:up
 # 3. Generate Prisma Client
 npm run api:generate
 
-# 4. Buat migration pertama (belum dijalankan pada scaffold ini)
+# 4. Buat/terapkan migration jika database belum memilikinya
 npm run api:migrate -- --name init
 
 # 5. Isi data demo
@@ -152,40 +151,49 @@ Format validasi (422):
 }
 ```
 
-| Method | Endpoint | Status scaffold |
+| Method | Endpoint | Status implementasi |
 |---|---|---|
 | GET | `/api/health` | ✅ jalan |
 | POST | `/api/register` | ✅ jalan |
 | POST | `/api/login` | ✅ jalan |
 | GET | `/api/me` | ✅ jalan |
 | POST | `/api/logout` | ✅ jalan (stateless) |
-| GET | `/api/ticket` | 🚧 501 |
-| POST | `/api/ticket` | 🚧 501 |
-| GET | `/api/ticket/:code` | 🚧 501 |
-| DELETE | `/api/ticket/:code` | 🚧 501 |
-| POST | `/api/ticket-reply/:code` | 🚧 501 |
-| GET | `/api/users` | 🚧 501 |
-| GET | `/api/users/:id` | 🚧 501 |
-| POST | `/api/users` | 🚧 501 |
-| POST | `/api/users/:id` | 🚧 501 (alias frontend) |
-| PUT | `/api/users/:id` | 🚧 501 |
-| PATCH | `/api/users/:id` | 🚧 501 |
-| DELETE | `/api/users/:id` | 🚧 501 |
-| POST | `/api/profile` | 🚧 501 |
-| DELETE | `/api/profile/avatar` | 🚧 501 |
-| GET | `/api/dashboard/statistic` | 🚧 501 |
+| GET | `/api/ticket` | ✅ list, filter, pagination opsional |
+| POST | `/api/ticket` | ✅ create (gambar opsional) |
+| GET | `/api/ticket/:code` | ✅ detail + ownership |
+| DELETE | `/api/ticket/:code` | ✅ admin-only soft delete |
+| POST | `/api/ticket-reply/:code` | ✅ owner/admin, admin dapat memperbarui status |
+| GET | `/api/users` | ✅ admin, pagination 10 + filter search/role |
+| GET | `/api/users/:id` | ✅ admin |
+| POST | `/api/users` | ✅ admin |
+| POST | `/api/users/:id` | ✅ alias frontend |
+| PUT | `/api/users/:id` | ✅ admin |
+| PATCH | `/api/users/:id` | ✅ admin |
+| DELETE | `/api/users/:id` | ✅ admin (FK restrict dapat menolak user yang punya tiket/balasan) |
+| POST | `/api/profile` | ✅ authenticated user |
+| DELETE | `/api/profile/avatar` | ✅ authenticated user |
+| GET | `/api/dashboard/statistic` | ✅ admin |
 
 Endpoint admin dilindungi `authenticate` + `requireAdmin`.
 
-### Bentuk data yang harus dihasilkan nanti
+### Bentuk data
 
 - `user`: `id`, `name`, `email`, `nim`, `avatar` (URL absolut `/storage/...`), `role`
 - `ticket`: `code`, `title`, `category`, `priority` (`low/medium/high`), `description`, `image_url`, `status`, `created_at`, `completed_at`, `user`, `ticket_replies`
 - `reply`: `id`, `content`, `created_at`, `user`
-- `statistic`: `total_tickets`, `active_tickets`, `resolved_tickets`, `avg_resolution_time`, `status_distribution.{open,in_progress,resolved,rejected}`
+- `statistic`: `total_tickets`, `active_tickets`, `resolved_tickets`, `avg_resolution_time`, `status_distribution.{open,in_progress,resolved,rejected}`, `category_distribution`
 
 Serializer untuk bentuk tersebut tersedia di `src/utils/serializers.ts`.
 Input priority `normal` dari frontend diterima sebagai alias dan disimpan sebagai `medium`.
+
+### List tiket
+
+`GET /api/ticket` menerima `search`, `status`, `priority`, dan `date` (`today`, `week`,
+`month`). `on_progress` dinormalisasi ke `in_progress`; date window dihitung dalam UTC.
+Tanpa `page`/`per_page`, endpoint mengembalikan seluruh array agar tetap kompatibel dengan
+store Vue saat ini. Pagination dapat diminta dengan `?page=1&per_page=10`; response tetap
+memiliki `data` array dan menambahkan `meta.current_page`, `meta.per_page`, `meta.last_page`,
+dan `meta.total`.
 
 ---
 
@@ -200,8 +208,8 @@ Input priority `normal` dari frontend diterima sebagai alias dan disimpan sebaga
   `src/utils/constants.ts`. Tiket memakai soft delete (`deletedAt`), `completedAt`, dan `image`.
 - Upload avatar dibatasi 2 MB; gambar tiket 10 MB. GIF diizinkan untuk avatar register/admin,
   tetapi tidak untuk update profil sendiri.
-- Migration **belum dibuat** pada scaffold ini. Itu sebabnya langkah
-  `prisma:migrate` di atas belum dijalankan.
+- Migration awal tersedia di `prisma/migrations/` dan sudah diterapkan pada lingkungan saat ini.
+- Jangan reset database atau menjalankan seed berulang tanpa mengecek efeknya.
 
 ---
 
