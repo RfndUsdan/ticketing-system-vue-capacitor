@@ -1,43 +1,49 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-const token = Cookies.get('token')
+const baseURL =
+    import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8000/api'
 
-axios.defaults.baseURL = 'http://192.168.1.11:8000/api'
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-// axios.defaults.headers.common['Content-Type'] = 'application/json'
-axios.defaults.headers.common['Accept'] = 'application/json'
-axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-
-axios.interceptors.request.use(
-    config => {
-        const token = Cookies.get('token')
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-        }
-        return config
+export const axiosInstance = axios.create({
+    baseURL,
+    headers: {
+        Accept: 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
     },
-)
+})
 
-axios.interceptors.response.use(
-    response => {
-        return response
-    },
-    error => {
-        if (error.response) {
-            if (error.response.status === 403) {
-                alert('Akses ditolak! Anda tidak memiliki izin untuk halaman ini.')
-                window.location.href = '/' 
-            }
+axiosInstance.interceptors.request.use((config) => {
+    const token = Cookies.get('token')
+    config.headers = config.headers || {}
 
-            if (error.response.status === 401) {
-                Cookies.remove('token') 
-                window.location.href = '/auth/login'
-            }
-        }
-
-        return Promise.reject(error)
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    } else {
+        delete config.headers.Authorization
     }
-)
 
-export const axiosInstance = axios
+    return config
+})
+
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const status = error.response?.status
+        const requestPath = String(error.config?.url || '').replace(/\/+$/, '')
+        const isPublicAuthRequest =
+            requestPath.endsWith('/login') || requestPath.endsWith('/register')
+
+        // A failed login/register is form feedback, not an expired session.
+        if (status === 401 && !isPublicAuthRequest) {
+            Cookies.remove('token')
+            localStorage.removeItem('user')
+
+            if (window.location.pathname !== '/auth/login') {
+                window.location.assign('/auth/login')
+            }
+        }
+
+        // Leave 403 handling to the calling view so it can show the API message.
+        return Promise.reject(error)
+    },
+)

@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
-import router  from "@/router";
 
 export const useTicketStore = defineStore("ticket", {
     state: () => ({
@@ -14,6 +13,7 @@ export const useTicketStore = defineStore("ticket", {
     actions: {
         async fetchTickets(params) {
             this.loading = true
+            this.error = null
 
             try {
                 const response = await axiosInstance.get('ticket', { params })
@@ -28,6 +28,7 @@ export const useTicketStore = defineStore("ticket", {
 
         async fetchTicket(code) {
             this.loading = true
+            this.error = null
 
             try {
                 const response = await axiosInstance.get(`/ticket/${code}`)
@@ -35,6 +36,7 @@ export const useTicketStore = defineStore("ticket", {
                 return response.data.data
             } catch (error) {
                 this.error = handleError(error)
+                throw error
             } finally {
                 this.loading = false
             }
@@ -45,12 +47,11 @@ export const useTicketStore = defineStore("ticket", {
             this.error = null 
 
             try {
-                const response = await axiosInstance.post("/ticket", payload, {
-                })
+                const response = await axiosInstance.post("/ticket", payload)
 
                 this.success = response.data.message
 
-                router.push({name: 'app.dashboard'})
+                return response.data.data
             } catch (error) {
                 this.error = handleError(error)
             } finally {
@@ -60,6 +61,7 @@ export const useTicketStore = defineStore("ticket", {
 
         async createTicketReply(code, payload) {
             this.loading = true
+            this.error = null
 
             try {
                 const response = await axiosInstance.post(`/ticket-reply/${code}`, payload)
@@ -69,6 +71,7 @@ export const useTicketStore = defineStore("ticket", {
                 return response.data.data
             } catch (error) {
                 this.error = handleError(error)
+                throw error
             } finally {
                 this.loading = false
             }

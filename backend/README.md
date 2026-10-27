@@ -3,7 +3,8 @@
 REST API untuk aplikasi **Apa Kabar** menggunakan **Node.js + Express 5 + TypeScript + Prisma 7 + PostgreSQL**.
 
 > **Status: backend inti bertahap.**
-> Frontend **belum diintegrasikan** ke backend ini. Yang sudah berfungsi:
+> Frontend Vue menggunakan `VITE_API_BASE_URL` untuk mengakses backend ini; konfigurasi Android/Capacitor
+> belum diubah. Endpoint yang berfungsi:
 > `GET /api/health`, `POST /api/register` (termasuk avatar), `POST /api/login`, `GET /api/me`,
 > `POST /api/logout`, serta list/detail/create tiket dengan auth, ownership, filter, dan pagination opsional.
 > Seluruh route tiket, user, profil, dan dashboard pada tabel endpoint sudah memiliki implementasi.
@@ -213,21 +214,13 @@ dan `meta.total`.
 
 ---
 
-## Catatan integrasi frontend (belum dilakukan)
+## Konfigurasi frontend
 
-Saat nanti diintegrasikan:
-
-1. Tambahkan `.env` di root frontend:
-   ```env
-   VITE_API_BASE_URL=http://localhost:8000/api
-   ```
-2. Ubah `src/plugins/axios.js` agar memakai `import.meta.env.VITE_API_BASE_URL`.
-3. Untuk emulator Android gunakan `http://10.0.2.2:8000/api`.
-4. Untuk HP fisik gunakan IP LAN PC, atau HTTPS tunnel saat testing di luar jaringan lokal.
-5. Pastikan origin Capacitor (`http://localhost` / `capacitor://localhost`)
-   ada di `CORS_ORIGINS`.
-6. `image_url` harus absolut agar tampil di WebView. Serializer sudah membentuk
-   URL dari `PUBLIC_BASE_URL`.
+`src/plugins/axios.js` membaca `VITE_API_BASE_URL`; contoh ada di root `.env.example`.
+Untuk web lokal gunakan `http://localhost:8000/api`. Untuk emulator Android gunakan
+`http://10.0.2.2:8000/api`; untuk perangkat fisik gunakan IP LAN backend. Atur juga
+backend `PUBLIC_BASE_URL` ke host yang dapat dijangkau perangkat agar URL avatar/gambar absolut
+berfungsi. Konfigurasi Capacitor belum diubah.
 
 ---
 

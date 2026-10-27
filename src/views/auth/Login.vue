@@ -2,12 +2,10 @@
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
-const router = useRouter()
 
-const { loading, error, user } = storeToRefs(authStore) 
+const { loading, error } = storeToRefs(authStore)
 const { login } = authStore
 
 // TODO: Create form ref with login fields
@@ -30,18 +28,12 @@ const handleSubmit = async () => {
 
     await login(form.value)
 
-    if (!error.value) {
-        if (authStore.user?.role === 'admin') {
-            router.push({ name: 'admin.dashboard' })
-        } else {
-            router.push('/') 
-        }
-    } else {
+    if (error.value) {
         if (error.value === 'Unauthorized') {
             form.value.password = ''
             alert('Email atau password salah')
         } else {
-            alert('Terjadi kesalahan pada server')
+            alert(typeof error.value === 'string' ? error.value : 'Periksa kembali data login.')
         }
     }
 }

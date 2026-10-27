@@ -40,11 +40,7 @@ export const useUserStore = defineStore("user", {
             this.error = null;
             
             try {
-                const response = await axiosInstance.post('/users', payload, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data' 
-                    }
-                });
+                const response = await axiosInstance.post('/users', payload);
                 
                 this.success = response.data.message || 'User berhasil ditambahkan';
                 return response.data.data;
@@ -80,11 +76,8 @@ export const useUserStore = defineStore("user", {
             this.error = null;
             
             try {
-                const response = await axiosInstance.post(`/users/${id}`, payload, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data' 
-                    }
-                });
+                // Keep POST for the existing frontend; backend has this compatibility route.
+                const response = await axiosInstance.post(`/users/${id}`, payload);
                 
                 this.success = response.data.message || 'User berhasil diupdate';
                 return response.data.data;

@@ -5,14 +5,13 @@ import { storeToRefs } from 'pinia'
 import { capitalize } from 'lodash'
 import feather from 'feather-icons'
 import { DateTime } from 'luxon'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 const ticketStore = useTicketStore()
 const { success, error, loading} = storeToRefs(ticketStore)
-const { fetchTicket, createTicketReply, deleteTicket} = ticketStore
+const { fetchTicket, createTicketReply } = ticketStore
 
 const route = useRoute()
-const router = useRouter()
 
 const ticket = ref({})
 const form = ref({
@@ -20,31 +19,23 @@ const form = ref({
 })
 
 const fetchTicketDetail = async () => {
-    const response = await fetchTicket(route.params.code)
-    console.log("Data Tiket dari API:", response)
-
-    ticket.value = response
-    form.value.status = response.status
+    try {
+        const response = await fetchTicket(route.params.code)
+        ticket.value = response || {}
+    } catch {
+        ticket.value = {}
+    }
 }
 
 const handleSubmit = async () => {
-    await createTicketReply(route.params.code, form.value)
-
-    error.value = null
-    form.value.content = null
-
-    await fetchTicketDetail()
-}
-
-const handleDelete = async () => {
-        if (confirm(`Apakah Anda yakin ingin menghapus tiket #${ticket.value.code}?`)) {
-            try {
-                await deleteTicket(ticket.value.code)
-                router.push({ name: 'app.dashboard' }) 
-            } catch (err) {
-                console.error("Gagal menghapus:", err)
-            }
-        }
+    try {
+        await createTicketReply(route.params.code, form.value)
+        form.value.content = ''
+        await fetchTicketDetail()
+    } catch (err) {
+        if (typeof error.value === 'string') alert(error.value)
+        console.error('Gagal mengirim balasan:', err)
+    }
 }
 
 const getStatusColor = (status) => {
@@ -160,12 +151,6 @@ onMounted(async () => {
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
-                        <button type="button" @click="handleDelete" 
-                            class="px-4 py-2 border border-red-100 rounded-lg text-sm text-red-600 hover:bg-red-50"
-                            :disabled="loading">
-                            <i data-feather="trash-2" class="w-4 h-4 inline-block mr-2"></i>
-                            Hapus
-                        </button>
                     </div>
                     <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700" :disabled="loading">
                         <i data-feather="send" class="w-4 h-4 inline-block mr-2"></i>

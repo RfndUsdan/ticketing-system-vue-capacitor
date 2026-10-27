@@ -57,7 +57,7 @@ onMounted(async () => {
                         class="border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                         <option value="">Semua Status</option>
                         <option value="open">Open</option>
-                        <option value="on_progress">In Progress</option>
+                        <option value="in_progress">In Progress</option>
                         <option value="resolved">Resolved</option>
                         <option value="rejected">Rejected</option>
                     </select>
@@ -70,7 +70,7 @@ onMounted(async () => {
                         <option value="low">Low</option>
                     </select>
                     <!-- Date Filter -->
-                    <select
+                    <select v-model="filters.date"
                         class="border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                         <option value="">Semua Tanggal</option>
                         <option value="today">Hari Ini</option>
@@ -116,9 +116,8 @@ onMounted(async () => {
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <!-- PERBAIKAN: Gunakan ternary operator untuk mengecek apakah sudah ada kata http atau belum -->
                                     <img v-if="ticket.user?.avatar" 
-                                        :src="ticket.user.avatar.startsWith('http') ? ticket.user.avatar : `http://192.168.1.11:8000/storage/${ticket.user.avatar}`" 
+                                        :src="ticket.user.avatar" 
                                         :alt="ticket.user.name" 
                                         class="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm">
                                     

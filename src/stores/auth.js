@@ -21,13 +21,18 @@ export const useAuthStore = defineStore("auth", {
         async login(credentials) {
             this.loading = true
             this.error = null
+            this.success = null
 
             try {
                 const response = await axiosInstance.post('/login', credentials)
                 
                 const { token, user } = response.data.data
 
-                Cookies.set('token', token)
+                Cookies.set('token', token, {
+                    expires: 7,
+                    sameSite: 'lax',
+                    secure: window.location.protocol === 'https:',
+                })
 
                 this.user = user
                 this.success = response.data.message
@@ -48,14 +53,26 @@ export const useAuthStore = defineStore("auth", {
 
         async register(credentials) {
             this.loading = true
+            this.error = null
+            this.success = null
             try {
-                const response = await axiosInstance.post('/register', credentials)
+                const { name, email, nim, password } = credentials
+                const response = await axiosInstance.post('/register', {
+                    name,
+                    email,
+                    nim,
+                    password,
+                })
                 const { token, user } = response.data.data
 
                 this.success = response.data.message
                 this.user = user 
                 
-                Cookies.set('token', token)
+                Cookies.set('token', token, {
+                    expires: 7,
+                    sameSite: 'lax',
+                    secure: window.location.protocol === 'https:',
+                })
                 localStorage.setItem('user', JSON.stringify(user))
 
                 router.push({ name: 'app.dashboard'})

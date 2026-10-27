@@ -21,15 +21,16 @@
     const { fetchTicket, createTicketReply, deleteTicket } = ticketStore
 
     const fetchTicketDetail = async () => {
-        const response = await fetchTicket(route.params.code)
-
-        ticket.value = response
-        form.value.status = response.status
+        try {
+            const response = await fetchTicket(route.params.code)
+            if (!response) return
+            ticket.value = response
+            form.value.status = response.status
+        } catch (error) {
+            console.error('Gagal mengambil tiket:', error)
+        }
     }
 
-    // TODO: Implement handleSubmit function
-    // Hint: This should call createTicketReply with code and form
-    // Then refetch ticket details
     const handleSubmit = async () => {
         if (ticket.value.status === 'resolved') {
             alert("Tiket ini sudah berstatus 'Selesai'. Jawaban tetap akan terkirim sebagai arsip tambahan.")
@@ -58,7 +59,7 @@
             try {
                 await deleteTicket(ticket.value.code)
                 // Setelah sukses, arahkan kembali ke daftar tiket
-                router.push({ name: 'app.dashboard' }) 
+                router.push({ name: 'admin.ticket' })
             } catch (err) {
                 console.error("Gagal menghapus:", err)
             }
@@ -83,8 +84,6 @@
     form.value.status = 'resolved'
     await handleSubmit() 
     }
-    // TODO: Implement onMounted hook
-    // Hint: Fetch initial ticket details and initialize feather icons
     onMounted(async () => {
         await fetchTicketDetail()
 

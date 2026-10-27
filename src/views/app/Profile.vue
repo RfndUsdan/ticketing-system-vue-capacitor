@@ -148,9 +148,7 @@ const handleSubmit = async () => {
     }
 
     try {
-        const response = await axiosInstance.post('/profile', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        const response = await axiosInstance.post('/profile', formData);
         
         alert('Profil berhasil diperbarui!');
         authStore.user = response.data.data;

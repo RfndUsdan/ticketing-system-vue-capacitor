@@ -30,11 +30,12 @@ onMounted(async () => {
 
 const handleDelete = async (id) => {
     if (confirm('Apakah Anda yakin ingin menghapus user ini?')) {
-        await deleteUser(id);
-        // Render ulang icon setelah ada data yang terhapus
-        nextTick(() => {
-            feather.replace();
-        });
+        try {
+            await deleteUser(id);
+            nextTick(() => feather.replace());
+        } catch (error) {
+            alert(userStore.error || 'User tidak dapat dihapus. Periksa apakah user masih memiliki tiket.');
+        }
     }
 };
 </script>

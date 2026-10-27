@@ -12,7 +12,7 @@ const authStore = useAuthStore();
 const form = ref({
   title: "",
   category: "", 
-  priority: "normal",
+  priority: "medium",
   description: "",
   image: null,
   isConfirmed: false, 
@@ -49,7 +49,10 @@ const handleSubmit = async () => {
   await ticketStore.createTicket(formData);
 
   if (ticketStore.error) {
-    alert(`Gagal membuat tiket: ${ticketStore.error}`);
+    const message = typeof ticketStore.error === 'string'
+      ? ticketStore.error
+      : Object.values(ticketStore.error).flat().join(' ');
+    alert(`Gagal membuat tiket: ${message}`);
   } else {
     alert("Tiket berhasil dibuat!");
     router.push({ name: "app.dashboard" }); 
@@ -160,7 +163,7 @@ onMounted(() => {
                   class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-gray-50 focus:bg-white appearance-none transition-colors"
                 >
                   <option value="low">Rendah</option>
-                  <option value="normal">Normal</option>
+                  <option value="medium">Medium</option>
                   <option value="high">Tinggi</option>
                 </select>
                 <i

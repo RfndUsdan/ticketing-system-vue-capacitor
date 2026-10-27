@@ -1,25 +1,26 @@
 import { defineStore } from "pinia";
 import { axiosInstance } from "@/plugins/axios";
-import { handleError } from "vue";
+import { handleError } from "@/helpers/errorHelper";
 
 export const useDashboardStore = defineStore("dashboard", {
     state: () => ({
         statistic: null,
         loading: false,
         error: null,
-        succes: null,
+        success: null,
     }),
 
     actions: {
         async fetchStatistics() {
             this.loading = true;
+            this.error = null;
 
             try {
                 const response = await axiosInstance.get('dashboard/statistic')
 
                 this.statistic = response.data.data
             } catch (error) {
-                this.error = error.message
+                this.error = handleError(error)
             } finally {
                 this.loading = false
             }
