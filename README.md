@@ -47,7 +47,7 @@
 
 Apa Kabar merupakan aplikasi ticketing untuk membantu pengguna menyampaikan laporan kerusakan barang atau fasilitas, melampirkan bukti foto, serta memantau perkembangan laporan. Dari sisi pengelola, sistem membantu petugas menerima, memeriksa, dan memperbarui status tiket secara lebih terpusat.
 
-Proyek yang menjadi dasar dokumen ini menggunakan **Vue.js** untuk antarmuka, **Laravel 12** sebagai REST API, **MySQL/MariaDB** sebagai basis data, serta **Capacitor** untuk membungkus aplikasi menjadi aplikasi Android. Fokus dokumen adalah kebutuhan pengguna, alur kerja, karakteristik mobile, dan target yang dapat diuji.
+Arsitektur aktif proyek menggunakan **Vue.js + Vite** untuk antarmuka, **Node.js + Express 5 + TypeScript** sebagai REST API, **Prisma 7 + PostgreSQL** untuk akses dan penyimpanan data, serta **Capacitor** untuk membungkus aplikasi menjadi aplikasi Android. Laravel 12/MySQL merupakan arsitektur backend lama dan referensi historis, bukan backend aktif saat ini. Fokus dokumen tetap pada kebutuhan pengguna, alur kerja, karakteristik mobile, dan target yang dapat diuji.
 
 ### Tujuan dokumen
 
@@ -141,14 +141,16 @@ Apa Kabar ditawarkan sebagai aplikasi Android untuk mengirim laporan dan memanta
 
 ### Arsitektur solusi
 
-`Vue.js` · `Vite` · `Capacitor Android` · `Laravel 12` · `MySQL / MariaDB` · `REST API + HTTPS`
+`Vue.js` · `Vite` · `Capacitor Android` · `Node.js` · `Express 5` · `TypeScript` · `Prisma 7` · `PostgreSQL` · `REST API + HTTPS`
 
 | Lapisan | Komponen | Tanggung jawab |
 |---|---|---|
 | **Mobile UI** | Vue.js + Capacitor | Login, formulir laporan, daftar/detail tiket, dan interaksi pengguna. |
-| **API** | Laravel 12 REST API | Autentikasi, validasi, proses bisnis, otorisasi, dan respons data. |
-| **Database** | MySQL/MariaDB | Menyimpan akun, tiket, status, dan metadata lampiran. |
+| **API** | Node.js + Express 5 + TypeScript | Autentikasi, validasi, proses bisnis, otorisasi, dan respons data. |
+| **Database** | PostgreSQL melalui Prisma 7 | Menyimpan akun, tiket, status, dan metadata lampiran. |
 | **Berkas** | Storage gambar | Menyimpan foto secara persisten, idealnya pada layanan object storage atau disk yang sesuai. |
+
+> **Status implementasi:** source backend aktif berada di `backend/`. Frontend Vue memakai `VITE_API_BASE_URL` untuk mengakses API baru. Source PHP Laravel lama tidak disertakan di workspace ini. Integrasi end-to-end pada browser/perangkat Android dan konfigurasi Capacitor masih perlu diuji.
 
 ### Alur status tiket yang diusulkan
 
@@ -223,9 +225,9 @@ Spesifikasi pengembang merangkum kebutuhan perangkat lunak dan layanan yang digu
 |---|---|---|
 | **Frontend** | Vue.js + Vite | Membangun antarmuka dan mengirim request ke REST API. |
 | **Mobile wrapper** | Capacitor Android | Mengemas frontend sebagai aplikasi Android untuk pengujian pada perangkat fisik. |
-| **Backend** | Laravel 12 + PHP | Menangani autentikasi, validasi, proses tiket, dan respons API. |
-| **Database** | MySQL/MariaDB | Menyimpan akun, tiket, status, dan metadata lampiran. |
-| **Tools pengembangan** | VS Code, Node.js/npm, Composer, PHP, Android Studio, Git/GitHub | Mendukung build frontend/backend, pengujian Android, dan version control. |
+| **Backend** | Node.js + Express 5 + TypeScript + Prisma 7 | Menangani autentikasi, validasi, proses tiket, dan respons API. |
+| **Database** | PostgreSQL | Menyimpan akun, tiket, status, dan metadata lampiran. |
+| **Tools pengembangan** | VS Code, Node.js/npm, Prisma CLI, Android Studio, Git/GitHub | Mendukung build frontend/backend, pengujian Android, dan version control. PHP/Composer hanya diperlukan bila memelihara backend Laravel lama. |
 | **Pengujian** | HP Android fisik + backend aktif | Menguji login, tiket, detail, status, gambar, jaringan, dan hak akses. |
 | **Deployment** | API HTTPS + storage persisten | Memberi URL yang dapat diakses lintas jaringan; menjaga ketersediaan file gambar. |
 
@@ -284,8 +286,10 @@ Keberhasilan tidak hanya ditentukan oleh tampilan Android. Backend perlu dapat d
 3. Android Developers. “Responsive and adaptive design with Views.” <https://developer.android.com/develop/ui/views/layout/responsive-adaptive-design-with-views>
 4. SP4N-LAPOR! “Layanan Aspirasi dan Pengaduan Online Rakyat.” <https://sp4n.lapor.go.id/>
 5. LAPOR! “Pertanyaan Seputar LAPOR!” <https://lapor.go.id/faq>
-6. Laravel. “Laravel 12.x Documentation.” <https://laravel.com/docs/12.x>
+6. Express. “Express 5.x Documentation.” <https://expressjs.com/>
 7. Capacitor. “Documentation.” <https://capacitorjs.com/docs>
+8. Prisma. “Prisma ORM Documentation.” <https://www.prisma.io/docs>
+9. Laravel. “Laravel 12.x Documentation.” <https://laravel.com/docs/12.x> (referensi backend lama)
 
 ---
 
