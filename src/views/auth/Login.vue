@@ -2,6 +2,7 @@
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
+import { showPopup } from '@/helpers/popup'
 
 const authStore = useAuthStore()
 
@@ -22,7 +23,7 @@ const isPasswordVisible = ref(false)
 // and handle any errors
 const handleSubmit = async () => {
     if (!form.value.email || !form.value.password) {
-        alert('Harap isi semua field')
+        showPopup('Harap isi semua field', 'warning')
         return
     }
 
@@ -31,9 +32,9 @@ const handleSubmit = async () => {
     if (error.value) {
         if (error.value === 'Unauthorized') {
             form.value.password = ''
-            alert('Email atau password salah')
+            showPopup('Email atau password salah', 'error')
         } else {
-            alert(typeof error.value === 'string' ? error.value : 'Periksa kembali data login.')
+            showPopup(typeof error.value === 'string' ? error.value : 'Periksa kembali data login.', 'error')
         }
     }
 }

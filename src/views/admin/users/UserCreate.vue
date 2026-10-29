@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
 import feather from 'feather-icons';
+import { showPopup } from '@/helpers/popup';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -50,11 +51,11 @@ const handleSubmit = async () => {
 
     try {
         await userStore.createUser(formData);
-        alert('User baru berhasil ditambahkan!');
+        showPopup('User baru berhasil ditambahkan!');
         router.push({ name: 'admin.users' }); 
     } catch (error) {
         console.error("Gagal menambah user", error);
-        alert('Gagal menambah data. Pastikan Email atau NIM belum digunakan.');
+        showPopup('Gagal menambah data. Pastikan Email atau NIM belum digunakan.', 'error');
     }
 };
 </script>

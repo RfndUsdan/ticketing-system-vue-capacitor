@@ -2,6 +2,7 @@
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
+import { showPopup } from '@/helpers/popup'
 
 const authStore = useAuthStore();
 const { loading, error } = storeToRefs(authStore);
@@ -25,7 +26,7 @@ const handleSubmit = async () => {
     }
 
     await register(form.value)
-    if (typeof authStore.error === 'string') alert(authStore.error)
+    if (typeof authStore.error === 'string') showPopup(authStore.error, 'error')
 }
 
 const togglePassword = () => {

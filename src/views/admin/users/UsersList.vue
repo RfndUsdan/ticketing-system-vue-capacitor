@@ -4,6 +4,7 @@ import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
 import { capitalize, debounce } from 'lodash';
 import feather from 'feather-icons';
+import { showPopup, confirmPopup } from '@/helpers/popup';
 
 const userStore = useUserStore();
 const { users, loading } = storeToRefs(userStore);
@@ -29,12 +30,12 @@ onMounted(async () => {
 });
 
 const handleDelete = async (id) => {
-    if (confirm('Apakah Anda yakin ingin menghapus user ini?')) {
+    if (await confirmPopup('Apakah Anda yakin ingin menghapus user ini?', 'Hapus pengguna?')) {
         try {
             await deleteUser(id);
             nextTick(() => feather.replace());
         } catch (error) {
-            alert(userStore.error || 'User tidak dapat dihapus. Periksa apakah user masih memiliki tiket.');
+            showPopup(userStore.error || 'User tidak dapat dihapus. Periksa apakah user masih memiliki tiket.', 'error');
         }
     }
 };

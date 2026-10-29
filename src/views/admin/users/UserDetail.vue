@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
 import feather from 'feather-icons';
+import { showPopup } from '@/helpers/popup';
 
 const route = useRoute();
 const router = useRouter();
@@ -35,7 +36,7 @@ onMounted(async () => {
             currentAvatar.value = userData.avatar;
         }
     } catch (error) {
-        alert('Gagal mengambil data user.');
+        showPopup('Gagal mengambil data user.', 'error');
         router.push({ name: 'admin.users' });
     }
 
@@ -79,11 +80,11 @@ const handleSubmit = async () => {
 
     try {
         await userStore.updateUser(userId, formData);
-        alert('Data user berhasil diperbarui!');
+        showPopup('Data user berhasil diperbarui!');
         router.push({ name: 'admin.users' });
     } catch (error) {
         console.error("Gagal mengupdate user", error);
-        alert('Gagal memperbarui data. Cek kembali form Anda.');
+        showPopup('Gagal memperbarui data. Cek kembali form Anda.', 'error');
     }
 };
 </script>

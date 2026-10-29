@@ -7,7 +7,7 @@ import feather from 'feather-icons'
 import { DateTime } from 'luxon';
 
 const ticketStore = useTicketStore()
-const { tickets, success} = storeToRefs(ticketStore)
+const { tickets } = storeToRefs(ticketStore)
 const { fetchTickets } = ticketStore
 
 // TODO: Create filters ref with search fields
@@ -48,18 +48,6 @@ onMounted(async() => {
                 <i data-feather="plus" class="w-4 h-4 mr-2"></i>
                 Buat Tiket Baru
             </RouterLink>
-        </div>
-
-        <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative flex items-center justify-between"
-            role="alert" v-if="success">
-            <div class="flex items-center">
-                <i data-feather="check-circle" class="w-5 h-5 mr-2"></i>
-                <span>{{ success }}</span>
-            </div>
-
-            <button class="flex items-center justify-center" @click="success = null">
-                <i data-feather="x" class="w-4 h-4 text-green-600"></i>
-            </button>
         </div>
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">

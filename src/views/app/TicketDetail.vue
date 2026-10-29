@@ -6,6 +6,7 @@ import { capitalize } from 'lodash'
 import feather from 'feather-icons'
 import { DateTime } from 'luxon'
 import { useRoute } from 'vue-router'
+import { showPopup } from '@/helpers/popup'
 
 const ticketStore = useTicketStore()
 const { success, error, loading} = storeToRefs(ticketStore)
@@ -32,8 +33,9 @@ const handleSubmit = async () => {
         await createTicketReply(route.params.code, form.value)
         form.value.content = ''
         await fetchTicketDetail()
+        showPopup('Balasan berhasil dikirim. Tiket berhasil dibahas!')
     } catch (err) {
-        if (typeof error.value === 'string') alert(error.value)
+        showPopup(typeof error.value === 'string' ? error.value : 'Gagal mengirim balasan.', 'error')
         console.error('Gagal mengirim balasan:', err)
     }
 }

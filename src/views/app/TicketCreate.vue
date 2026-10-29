@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { useTicketStore } from "@/stores/ticket";
 import { useAuthStore } from "@/stores/auth"; 
 import feather from "feather-icons";
+import { showPopup } from "@/helpers/popup";
 
 const router = useRouter();
 const ticketStore = useTicketStore();
@@ -52,9 +53,9 @@ const handleSubmit = async () => {
     const message = typeof ticketStore.error === 'string'
       ? ticketStore.error
       : Object.values(ticketStore.error).flat().join(' ');
-    alert(`Gagal membuat tiket: ${message}`);
+    showPopup(`Gagal membuat tiket: ${message}`, 'error');
   } else {
-    alert("Tiket berhasil dibuat!");
+    showPopup("Tiket berhasil dibuat!");
     router.push({ name: "app.dashboard" }); 
   }
 };

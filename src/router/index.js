@@ -16,6 +16,7 @@ import AppTicketDetail from '@/views/app/TicketDetail.vue'
 import AppTicketCreate from '@/views/app/TicketCreate.vue'
 import Register from '@/views/auth/Register.vue'
 import Cookies from 'js-cookie'
+import { showPopup } from '@/helpers/popup'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -141,7 +142,7 @@ router.beforeEach((to, from, next) => {
       if (userData && userData.role === 'admin') {
         next() 
       } else {
-        alert('Akses Ditolak! Anda bukan Admin.')
+        showPopup('Akses ditolak. Anda bukan Admin.', 'error')
         next({ path: '/' }) 
       }
     } 

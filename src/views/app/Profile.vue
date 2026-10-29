@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import feather from 'feather-icons';
 import { axiosInstance } from '@/plugins/axios';
+import { showPopup, confirmPopup } from '@/helpers/popup';
 
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
@@ -86,16 +87,16 @@ const closeCropModal = () => {
 };
 
 const handleDeleteAvatar = async () => {
-    if (!confirm('Yakin ingin menghapus foto profil?')) return;
+    if (!await confirmPopup('Yakin ingin menghapus foto profil?', 'Hapus foto profil?')) return;
     
     const success = await authStore.deleteAvatar();
     
     if (success) {
         currentAvatar.value = '';
         form.value.avatar = null;
-        alert('Foto profil berhasil dihapus.');
+        showPopup('Foto profil berhasil dihapus.');
     } else {
-        alert(authStore.error || 'Gagal menghapus foto profil.');
+        showPopup(authStore.error || 'Gagal menghapus foto profil.', 'error');
     }
 };
 
@@ -119,12 +120,12 @@ const cancelEditing = () => {
 // --- FUNGSI LOGOUT DIPINDAHKAN KE SINI (Di luar handleSubmit) ---
 const handleLogout = async () => {
     try {
-        if (confirm('Apakah Anda yakin ingin keluar?')) {
+        if (await confirmPopup('Apakah Anda yakin ingin keluar?', 'Keluar dari akun?')) {
             await authStore.logout();
         }
     } catch (error) {
         console.error("Logout gagal:", error);
-        alert("Terjadi kesalahan saat logout.");
+        showPopup("Terjadi kesalahan saat logout.", 'error');
     }
 };
 
@@ -150,7 +151,7 @@ const handleSubmit = async () => {
     try {
         const response = await axiosInstance.post('/profile', formData);
         
-        alert('Profil berhasil diperbarui!');
+        showPopup('Profil berhasil diperbarui!');
         authStore.user = response.data.data;
         localStorage.setItem('user', JSON.stringify(response.data.data));
         
@@ -162,7 +163,7 @@ const handleSubmit = async () => {
         
     } catch (error) {
         console.error("Gagal update profil", error);
-        alert('Gagal memperbarui profil. Silakan periksa kembali data Anda.');
+        showPopup('Gagal memperbarui profil. Silakan periksa kembali data Anda.', 'error');
     } finally {
         isLoading.value = false;
     }

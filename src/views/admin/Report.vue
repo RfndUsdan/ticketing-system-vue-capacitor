@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia';
 import { DateTime } from 'luxon';
 import { capitalize } from 'lodash';
 import feather from 'feather-icons';
+import { showPopup } from '@/helpers/popup';
 
 const ticketStore = useTicketStore();
 const { tickets, loading } = storeToRefs(ticketStore);
@@ -49,7 +50,7 @@ const getStatusClass = (status) => {
 
 const exportToExcel = () => {
     if (filteredTickets.value.length === 0) {
-        alert('Tidak ada data untuk diekspor!');
+        showPopup('Tidak ada data untuk diekspor!', 'warning');
         return;
     }
 

@@ -6,6 +6,7 @@
     import feather from 'feather-icons'
     import { DateTime } from 'luxon'
     import { useRoute, useRouter } from 'vue-router'
+    import { showPopup, confirmPopup } from '@/helpers/popup'
 
     const route = useRoute()
     const router = useRouter()
@@ -33,7 +34,7 @@
 
     const handleSubmit = async () => {
         if (ticket.value.status === 'resolved') {
-            alert("Tiket ini sudah berstatus 'Selesai'. Jawaban tetap akan terkirim sebagai arsip tambahan.")
+            showPopup("Tiket ini sudah berstatus 'Selesai'. Jawaban tetap akan terkirim sebagai arsip tambahan.", 'warning')
         }
 
         try {
@@ -45,17 +46,19 @@
             
             // 4. Ambil data terbaru dari server untuk memperbarui daftar komentar
             await fetchTicketDetail()
+            showPopup(form.value.status === 'resolved' ? 'Tiket berhasil diselesaikan.' : 'Jawaban berhasil dikirim.')
             
             // 5. Refresh icon (feather icons)
             setTimeout(() => feather.replace(), 100)
 
         } catch (err) {
             console.error("Gagal mengirim jawaban:", err)
+            showPopup(typeof error.value === 'string' ? error.value : 'Gagal mengirim jawaban.', 'error')
         }
     }
 
     const handleDelete = async () => {
-        if (confirm(`Apakah Anda yakin ingin menghapus tiket #${ticket.value.code}?`)) {
+        if (await confirmPopup(`Apakah Anda yakin ingin menghapus tiket #${ticket.value.code}?`, 'Hapus tiket?')) {
             try {
                 await deleteTicket(ticket.value.code)
                 // Setelah sukses, arahkan kembali ke daftar tiket
