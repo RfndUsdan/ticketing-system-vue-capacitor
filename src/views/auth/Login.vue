@@ -59,12 +59,12 @@ const togglePassword = () => {
             <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
             <div class="mt-1 relative">
                 <input v-model="form.password" :type="isPasswordVisible ? 'text' : 'password'" id="password" name="password" required
-                    class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    class="w-full px-4 pr-20 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="••••••••">
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none" @click="togglePassword">
-                        <i v-show="!isPasswordVisible" data-feather="eye" class="w-4 h-4" aria-hidden="true"></i>
-                        <i v-show="isPasswordVisible" data-feather="eye-off" class="w-4 h-4" aria-hidden="true"></i>
+                <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+                    <button type="button" class="min-h-10 min-w-14 px-2 text-xs font-medium text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded" @click="togglePassword"
+                        :aria-label="isPasswordVisible ? 'Sembunyikan password' : 'Lihat password'">
+                        {{ isPasswordVisible ? 'Sembunyikan' : 'Lihat' }}
                     </button>
                 </div>
             </div>
