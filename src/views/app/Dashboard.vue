@@ -10,8 +10,6 @@ const ticketStore = useTicketStore()
 const { tickets } = storeToRefs(ticketStore)
 const { fetchTickets } = ticketStore
 
-// TODO: Create filters ref with search fields
-// Hint: You'll need search, status, priority, and date
 const filters = ref({
     search: '',
     status: '',
@@ -19,14 +17,10 @@ const filters = ref({
     date: '',
 })
 
-// TODO: Implement watch effect on filters
-// Hint: Use debounce and call fetchTickets with updated filters
 watch(filters, debounce(async () => {
     await fetchTickets(filters.value)
 }, 300), { deep: true})
 
-// TODO: Implement onMounted hook
-// Hint: Fetch initial tickets and initialize feather icons
 onMounted(async() => {
     await fetchTickets()
 

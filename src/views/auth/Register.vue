@@ -44,7 +44,6 @@ const toggleConfirmPassword = () => {
         <div>
             <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
             <div class="mt-1 relative">
-                <!-- TODO: Add v-model binding for name -->
                 <input v-model="form.name" type="text" id="name" name="name" required
                     class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="John Doe" :class="{'border-red-500 ring-red-500': error?.name }">
@@ -62,7 +61,6 @@ const toggleConfirmPassword = () => {
         <div>
             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
             <div class="mt-1 relative">
-                <!-- TODO: Add v-model binding for email -->
                 <input v-model="form.email" type="email" id="email" name="email" required
                     class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="nama@perusahaan.com" :class="{'border-red-500 ring-red-500': error?.email }">
@@ -80,7 +78,6 @@ const toggleConfirmPassword = () => {
         <div>
             <label for="nim" class="block text-sm font-medium text-gray-700">Nomor Induk Mahasiswa (NIM)</label>
             <div class="mt-1 relative">
-                <!-- TODO: Add v-model binding for NIM -->
                 <input v-model="form.nim" type="text" id="nim" name="nim" required
                     class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="Contoh: 123456789" :class="{'border-red-500 ring-red-500': error?.nim }">
@@ -98,12 +95,10 @@ const toggleConfirmPassword = () => {
         <div>
             <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
             <div class="mt-1 relative">
-                <!-- TODO: Add v-model binding for password -->
                 <input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="password" name="password" required minlength="6"
                     class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="••••••••" :class="{'border-red-500 ring-red-500': error?.password }">
                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <!-- TODO: Add click handler for password toggle -->
                     <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none" @click="togglePassword">
                         <i data-feather="eye" class="w-4 h-4" id="password-toggle"></i>
                     </button>
@@ -119,12 +114,10 @@ const toggleConfirmPassword = () => {
         <div>
             <label for="confirm-password" class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
             <div class="mt-1 relative">
-                <!-- TODO: Add v-model binding for confirm password -->
                 <input v-model="form.confirmPassword" :type="showConfirmPassword ? 'text' : 'password'" id="confirm-password" name="confirmPassword" required minlength="6"
                     class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="••••••••" :class="{'border-red-500 ring-red-500': error?.confirmPassword }">
                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <!-- TODO: Add click handler for confirm password toggle -->
                     <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none" @click="toggleConfirmPassword">
                         <i data-feather="eye" class="w-4 h-4" id="confirm-password-toggle"></i>
                     </button>
@@ -138,8 +131,7 @@ const toggleConfirmPassword = () => {
 
         <!-- Submit Button -->
         <div>
-            <!-- TODO: Add loading state to button -->
-            <button type="submit"
+            <button type="submit" :disabled="loading"
                 class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <span v-if="!loading">
                     Daftar
