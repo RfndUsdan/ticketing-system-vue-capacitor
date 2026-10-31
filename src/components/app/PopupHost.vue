@@ -7,10 +7,10 @@ import { popupState, closeConfirmation } from '@/helpers/popup'
     <Transition name="popup">
       <div v-if="popupState.notification" class="fixed top-5 right-5 z-[100] w-[calc(100vw-2.5rem)] max-w-[26rem]">
         <div class="flex items-start gap-3 rounded-xl border bg-white p-4 shadow-xl"
-          :class="popupState.notification.type === 'error' ? 'border-red-200' : popupState.notification.type === 'warning' ? 'border-amber-200' : 'border-green-200'"
+          :class="popupState.notification.type === 'error' ? 'border-red-200' : popupState.notification.type === 'warning' ? 'border-amber-200' : popupState.notification.type === 'info' ? 'border-blue-200' : 'border-green-200'"
           role="status" aria-live="polite">
-          <span class="mt-0.5 text-lg" :class="popupState.notification.type === 'error' ? 'text-red-600' : popupState.notification.type === 'warning' ? 'text-amber-600' : 'text-green-600'">
-            {{ popupState.notification.type === 'error' ? '!' : popupState.notification.type === 'warning' ? '⚠' : '✓' }}
+          <span class="mt-0.5 text-lg" :class="popupState.notification.type === 'error' ? 'text-red-600' : popupState.notification.type === 'warning' ? 'text-amber-600' : popupState.notification.type === 'info' ? 'text-blue-600' : 'text-green-600'">
+            {{ popupState.notification.type === 'error' ? '!' : popupState.notification.type === 'warning' ? '⚠' : popupState.notification.type === 'info' ? 'i' : '✓' }}
           </span>
           <p class="flex-1 text-sm font-medium text-gray-800">{{ popupState.notification.message }}</p>
           <button class="text-gray-400 hover:text-gray-700" aria-label="Tutup notifikasi" @click="popupState.notification = null">×</button>
