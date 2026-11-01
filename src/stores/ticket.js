@@ -5,6 +5,7 @@ import { handleError } from "@/helpers/errorHelper";
 export const useTicketStore = defineStore("ticket", {
     state: () => ({
         tickets: [],
+        ticketPagination: null,
         loading: false,
         error: null,
         success: null,
@@ -19,6 +20,7 @@ export const useTicketStore = defineStore("ticket", {
                 const response = await axiosInstance.get('ticket', { params })
 
                 this.tickets = response.data.data
+                this.ticketPagination = response.data.meta ?? null
             } catch (error) {
                 this.error = handleError(error)
             } finally {

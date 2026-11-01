@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useTicketStore } from '@/stores/ticket';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
@@ -7,7 +7,7 @@ import feather from 'feather-icons'
 import { DateTime } from 'luxon';
 
 const ticketStore = useTicketStore()
-const { tickets } = storeToRefs(ticketStore)
+const { tickets, ticketPagination, loading, error } = storeToRefs(ticketStore)
 const { fetchTickets } = ticketStore
 
 const filters = ref({
@@ -16,13 +16,32 @@ const filters = ref({
     priority: '',
     date: '',
 })
+const page = ref(1)
+const perPage = ref(10)
+const lastPage = computed(() => ticketPagination.value?.last_page ?? 1)
+const totalTickets = computed(() => ticketPagination.value?.total ?? 0)
 
-watch(filters, debounce(async () => {
-    await fetchTickets(filters.value)
-}, 300), { deep: true})
+const loadTickets = () => fetchTickets({
+    ...filters.value,
+    page: page.value,
+    per_page: perPage.value,
+})
+
+const debouncedFilterFetch = debounce(loadTickets, 300)
+watch(filters, () => {
+    page.value = 1
+    debouncedFilterFetch()
+}, { deep: true })
+
+watch([page, perPage], loadTickets)
+
+const resetFilters = () => {
+    filters.value = { search: '', status: '', priority: '', date: '' }
+    page.value = 1
+}
 
 onMounted(async() => {
-    await fetchTickets()
+    await loadTickets()
 
     feather.replace()
 })
@@ -75,7 +94,21 @@ onMounted(async() => {
                         <option value="month">Bulan Ini</option>
                     </select>
                 </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" @click="resetFilters"
+                        class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                        Hapus filter
+                    </button>
+                </div>
             </div>
+        </div>
+
+        <div v-if="loading" class="py-10 text-center text-sm text-gray-500" role="status">Memuat tiket...</div>
+        <div v-else-if="error" class="py-10 text-center text-sm text-red-600" role="alert">
+            {{ typeof error === 'string' ? error : 'Tiket gagal dimuat. Silakan coba lagi.' }}
+        </div>
+        <div v-else-if="tickets.length === 0" class="rounded-xl border border-gray-100 bg-white py-10 text-center text-sm text-gray-500">
+            Tidak ada tiket yang sesuai dengan filter.
         </div>
 
         <div class="space-y-4">
@@ -125,6 +158,29 @@ onMounted(async() => {
                         </div>
                     </div>
                 </RouterLink>
+            </div>
+        </div>
+
+        <div v-if="totalTickets > 0" class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-sm text-gray-500">
+                Halaman {{ ticketPagination?.current_page ?? page }} dari {{ lastPage }} · {{ totalTickets }} tiket
+            </p>
+            <div class="flex items-center gap-3">
+                <label for="tickets-per-page" class="text-sm text-gray-600">Per halaman</label>
+                <select id="tickets-per-page" v-model.number="perPage"
+                    class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                    <option :value="10">10</option>
+                    <option :value="20">20</option>
+                    <option :value="50">50</option>
+                </select>
+                <button type="button" @click="page--" :disabled="page <= 1 || loading"
+                    class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                    Sebelumnya
+                </button>
+                <button type="button" @click="page++" :disabled="page >= lastPage || loading"
+                    class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                    Berikutnya
+                </button>
             </div>
         </div>
 
