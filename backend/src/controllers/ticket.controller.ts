@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import type { Request, Response } from 'express'
 import type { Prisma } from '../generated/prisma/client.js'
 import { prisma } from '../config/prisma.js'
-import { fail, success, notImplemented } from '../utils/response.js'
+import { fail, success } from '../utils/response.js'
 import { serializeReply, serializeTicket } from '../utils/serializers.js'
 import { generateTicketCode } from '../utils/ticketCode.js'
 import {
@@ -15,6 +15,9 @@ const ticketRelations = {
   replies: {
     orderBy: { id: 'asc' as const },
     include: { user: true },
+  },
+  images: {
+    orderBy: { id: 'asc' as const },
   },
 }
 
@@ -67,6 +70,11 @@ function isUniqueConstraintError(error: unknown): boolean {
 async function removeUploadedFile(file?: Express.Multer.File): Promise<void> {
   if (!file) return
   await fs.unlink(file.path).catch(() => undefined)
+}
+
+async function removeUploadedFiles(files?: Express.Multer.File[]): Promise<void> {
+  if (!files || files.length === 0) return
+  await Promise.all(files.map((file) => fs.unlink(file.path).catch(() => undefined)))
 }
 
 export async function listTickets(req: Request, res: Response): Promise<void> {
@@ -130,7 +138,7 @@ export async function listTickets(req: Request, res: Response): Promise<void> {
 export async function createTicket(req: Request, res: Response): Promise<void> {
   const user = req.user
   if (!user) {
-    await removeUploadedFile(req.file)
+    await removeUploadedFiles(req.files as Express.Multer.File[] | undefined)
     fail(res, 401, 'Unauthenticated.')
     return
   }
@@ -141,23 +149,39 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
     priority: string
     description: string
   }
-  const image = req.file ? `tickets/${req.file.filename}` : null
+  const files = (req.files as Express.Multer.File[] | undefined) ?? []
+  const image = files[0] ? `tickets/${files[0].filename}` : null
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
     try {
-      const ticket = await prisma.ticket.create({
-        data: {
-          code: generateTicketCode(),
-          userId: user.id,
-          title,
-          category,
-          priority,
-          description,
-          image,
-          status: 'open',
-          completedAt: null,
-        },
-        include: { reporter: true },
+      const ticket = await prisma.$transaction(async (tx) => {
+        const created = await tx.ticket.create({
+          data: {
+            code: generateTicketCode(),
+            userId: user.id,
+            title,
+            category,
+            priority,
+            description,
+            image,
+            status: 'open',
+            completedAt: null,
+          },
+        })
+
+        if (files.length > 0) {
+          await tx.ticketImage.createMany({
+            data: files.slice(0, 5).map((file) => ({
+              ticketId: created.id,
+              path: `tickets/${file.filename}`,
+            })),
+          })
+        }
+
+        return tx.ticket.findUniqueOrThrow({
+          where: { id: created.id },
+          include: { ...ticketRelations, reporter: true },
+        })
       })
 
       success(
@@ -169,12 +193,12 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
       return
     } catch (error) {
       if (isUniqueConstraintError(error) && attempt < 4) continue
-      await removeUploadedFile(req.file)
+      await removeUploadedFiles(files)
       throw error
     }
   }
 
-  await removeUploadedFile(req.file)
+  await removeUploadedFiles(files)
   const error = new Error('Gagal membuat kode tiket unik.') as Error & {
     status?: number
   }

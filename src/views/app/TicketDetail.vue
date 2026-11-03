@@ -104,13 +104,28 @@ onMounted(async () => {
                 </p>
             </div>
 
-            <!-- Lampiran Gambar (Hanya tampil jika ada image_url) -->
-            <div class="mt-6 pt-6 border-t border-gray-100" v-if="ticket.image_url">
+            <!-- Lampiran Gambar (Hanya tampil jika ada gambar) -->
+            <div class="mt-6 pt-6 border-t border-gray-100" v-if="(ticket.images && ticket.images.length > 0) || ticket.image_url">
                 <h3 class="text-sm font-semibold text-gray-800 mb-3">Lampiran:</h3>
-                <img :src="ticket.image_url" alt="Lampiran Tiket" 
+                <div v-if="ticket.images && ticket.images.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <img
+                        v-for="(img, index) in ticket.images"
+                        :key="index"
+                        :src="img"
+                        :alt="`Lampiran Tiket ${index + 1}`"
+                        class="max-w-full md:max-w-lg rounded-lg border border-gray-200 shadow-sm cursor-pointer hover:opacity-90 transition"
+                        @click="window.open(img, '_blank')"
+                        title="Klik untuk memperbesar"
+                    />
+                </div>
+                <img
+                    v-else-if="ticket.image_url"
+                    :src="ticket.image_url"
+                    alt="Lampiran Tiket"
                     class="max-w-full md:max-w-lg rounded-lg border border-gray-200 shadow-sm cursor-pointer hover:opacity-90 transition"
                     @click="window.open(ticket.image_url, '_blank')"
-                    title="Klik untuk memperbesar">
+                    title="Klik untuk memperbesar"
+                />
             </div>
         </div>
     </div>

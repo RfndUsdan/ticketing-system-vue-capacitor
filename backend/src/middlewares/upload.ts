@@ -56,17 +56,39 @@ function createFileFilter(allowedMimeTypes: Set<string>, message: string) {
   }
 }
 
-export const uploadTicketImage = multer({
-  storage: createStorage(ticketsDir),
-  limits: {
-    fileSize: env.TICKET_IMAGE_MAX_UPLOAD_MB * 1024 * 1024,
-    files: 1,
-  },
-  fileFilter: createFileFilter(
-    ticketImageMimeTypes,
-    'Format gambar harus JPG, PNG, atau WEBP.',
-  ),
-}).single('image')
+export const uploadTicketImage = (req: any, res: any, next: any) => {
+  const uploader = multer({
+    storage: createStorage(ticketsDir),
+    limits: {
+      fileSize: env.TICKET_IMAGE_MAX_UPLOAD_MB * 1024 * 1024,
+      files: 5,
+    },
+    fileFilter: createFileFilter(
+      ticketImageMimeTypes,
+      'Format gambar harus JPG, PNG, atau WEBP.',
+    ),
+  })
+
+  uploader.fields([
+    { name: 'images', maxCount: 5 },
+    { name: 'image', maxCount: 1 },
+  ])(req, res, (err: any) => {
+    if (err) return next(err)
+    if (req.files) {
+      const files: any[] = []
+      if (Array.isArray((req.files as any).images)) {
+        files.push(...(req.files as any).images)
+      }
+      if (Array.isArray((req.files as any).image)) {
+        files.push(...(req.files as any).image)
+      }
+      if (files.length > 0) {
+        req.files = files
+      }
+    }
+    next()
+  })
+}
 
 /** Register dan admin user: avatar boleh GIF. */
 export const uploadAvatar = multer({

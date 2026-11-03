@@ -49,8 +49,9 @@ model Ticket {
   updatedAt   DateTime  @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
 
-  reporter User          @relation("TicketReporter", fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  reporter User           @relation("TicketReporter", fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   replies  TicketReply[]
+  images   TicketImage[]
 
   @@index([status])
   @@index([priority])
@@ -58,6 +59,18 @@ model Ticket {
   @@index([userId])
   @@index([deletedAt])
   @@map("tickets")
+}
+
+model TicketImage {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int      @map("ticket_id")
+  path      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([ticketId])
+  @@map("ticket_images")
 }
 
 model TicketReply {

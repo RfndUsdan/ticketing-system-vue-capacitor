@@ -114,12 +114,27 @@
                                 </p>
                             </div>
 
-                            <div class="mt-4" v-if="ticket.image_url">
+                            <div class="mt-4" v-if="(ticket.images && ticket.images.length > 0) || ticket.image_url">
                                 <h4 class="text-sm font-medium text-gray-700 mb-2">Lampiran Bukti:</h4>
-                                <img :src="ticket.image_url" alt="Lampiran Tiket" 
+                                <div v-if="ticket.images && ticket.images.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <img
+                                        v-for="(img, index) in ticket.images"
+                                        :key="index"
+                                        :src="img"
+                                        :alt="`Lampiran Tiket ${index + 1}`"
+                                        class="max-w-full md:max-w-md rounded-lg border border-gray-200 shadow-sm cursor-pointer hover:opacity-90 transition"
+                                        @click="window.open(img, '_blank')"
+                                        title="Klik untuk memperbesar di tab baru"
+                                    />
+                                </div>
+                                <img
+                                    v-else-if="ticket.image_url"
+                                    :src="ticket.image_url"
+                                    alt="Lampiran Tiket"
                                     class="max-w-full md:max-w-md rounded-lg border border-gray-200 shadow-sm cursor-pointer hover:opacity-90 transition"
                                     @click="window.open(ticket.image_url, '_blank')"
-                                    title="Klik untuk memperbesar di tab baru">
+                                    title="Klik untuk memperbesar di tab baru"
+                                />
                             </div>
                             <div class="mt-6 flex flex-wrap items-center gap-3">
                                 <span class="px-3 py-1 text-xs font-medium rounded-lg" :class="{

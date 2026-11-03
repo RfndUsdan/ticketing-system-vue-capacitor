@@ -15,23 +15,29 @@ const form = ref({
   category: "", 
   priority: "medium",
   description: "",
-  image: null,
+  images: [],
   isConfirmed: false, 
 });
 
-const imagePreview = ref(null);
+const imagePreviews = ref([]);
 
 const handleImageCapture = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    form.value.image = file;
-    imagePreview.value = URL.createObjectURL(file);
+  const files = Array.from(event.target.files || []);
+  if (files.length === 0) return;
+  for (const file of files) {
+    if (form.value.images.length >= 5) break;
+    form.value.images.push(file);
+    imagePreviews.value.push(URL.createObjectURL(file));
   }
+  event.target.value = "";
 };
 
-const removeImage = () => {
-  form.value.image = null;
-  imagePreview.value = null;
+const removeImage = (index) => {
+  form.value.images.splice(index, 1);
+  if (imagePreviews.value[index]) {
+    URL.revokeObjectURL(imagePreviews.value[index]);
+  }
+  imagePreviews.value.splice(index, 1);
   nextTick(() => feather.replace());
 };
 
@@ -43,9 +49,9 @@ const handleSubmit = async () => {
   formData.append("priority", form.value.priority);
   formData.append("description", form.value.description);
 
-  if (form.value.image) {
-    formData.append("image", form.value.image);
-  }
+  form.value.images.forEach((file) => {
+    formData.append("images", file);
+  });
 
   await ticketStore.createTicket(formData);
 
@@ -190,32 +196,36 @@ onMounted(() => {
 
           <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-3"
-              >Lampirkan Foto (Opsional)</label
+              >Lampirkan Foto (Opsional, maks. 5)</label
             >
 
-            <div v-if="imagePreview" class="w-full">
-              <div
-                class="rounded-xl overflow-hidden border border-gray-200 bg-gray-50 mb-3"
-              >
-                <img
-                  :src="imagePreview"
-                  alt="Preview"
-                  class="w-full h-48 object-cover"
-                />
-              </div>
-              <div class="flex justify-end">
-                <button
-                  type="button"
-                  @click="removeImage"
-                  class="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+            <div v-if="imagePreviews.length > 0" class="mb-4">
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div
+                  v-for="(preview, index) in imagePreviews"
+                  :key="index"
+                  class="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 aspect-square"
                 >
-                  <i data-feather="trash-2" class="w-4 h-4 mr-1.5"></i>
-                  Hapus Foto
-                </button>
+                  <img
+                    :src="preview"
+                    alt="Preview"
+                    class="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    @click="removeImage(index)"
+                    class="absolute top-2 right-2 inline-flex items-center justify-center w-7 h-7 rounded-full bg-red-600 text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    <i data-feather="x" class="w-4 h-4"></i>
+                  </button>
+                </div>
               </div>
+              <p class="mt-2 text-xs text-gray-500">
+                {{ imagePreviews.length }}/5 foto terpilih
+              </p>
             </div>
 
-            <div v-else class="grid grid-cols-2 gap-4">
+            <div v-if="form.images.length < 5" class="grid grid-cols-2 gap-4">
               <label
                 for="camera-upload"
                 class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-blue-50 hover:border-blue-300 transition-colors"
@@ -230,6 +240,7 @@ onMounted(() => {
                   class="hidden"
                   accept="image/*"
                   capture="environment"
+                  multiple
                   @change="handleImageCapture"
                 />
               </label>
@@ -247,6 +258,7 @@ onMounted(() => {
                   type="file"
                   class="hidden"
                   accept="image/*"
+                  multiple
                   @change="handleImageCapture"
                 />
               </label>

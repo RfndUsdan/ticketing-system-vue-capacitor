@@ -41,6 +41,7 @@ export function serializeReply(reply: TicketReply & { user: User }) {
 type TicketWithRelations = Ticket & {
   reporter?: User | null
   replies?: Array<TicketReply & { user: User }>
+  images?: Array<{ path: string }>
 }
 
 export function serializeTicket(
@@ -48,6 +49,9 @@ export function serializeTicket(
   options: { withReplies?: boolean } = {},
 ) {
   const withReplies = options.withReplies ?? true
+  const images = ticket.images ?? []
+  const imageUrls = images.map((img) => toStorageUrl(img.path)).filter((url): url is string => Boolean(url))
+  const legacyImageUrl = toStorageUrl(ticket.image)
 
   return {
     id: ticket.id,
@@ -57,7 +61,8 @@ export function serializeTicket(
     priority: ticket.priority,
     description: ticket.description,
     status: ticket.status,
-    image_url: toStorageUrl(ticket.image),
+    image_url: imageUrls[0] ?? legacyImageUrl ?? null,
+    images: imageUrls,
     created_at: toIso(ticket.createdAt),
     updated_at: toIso(ticket.updatedAt),
     completed_at: toIso(ticket.completedAt),
