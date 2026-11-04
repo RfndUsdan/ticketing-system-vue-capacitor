@@ -74,18 +74,20 @@ export const uploadTicketImage = (req: any, res: any, next: any) => {
     { name: 'image', maxCount: 1 },
   ])(req, res, (err: any) => {
     if (err) return next(err)
-    if (req.files) {
-      const files: any[] = []
+    const files: any[] = []
+    if (Array.isArray(req.files)) {
+      files.push(...req.files)
+    } else if (req.files && typeof req.files === 'object') {
       if (Array.isArray((req.files as any).images)) {
         files.push(...(req.files as any).images)
       }
       if (Array.isArray((req.files as any).image)) {
         files.push(...(req.files as any).image)
       }
-      if (files.length > 0) {
-        req.files = files
-      }
+    } else if ((req as any).file) {
+      files.push((req as any).file)
     }
+    req.files = files
     next()
   })
 }

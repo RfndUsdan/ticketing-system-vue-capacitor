@@ -56,9 +56,19 @@ const handleSubmit = async () => {
   await ticketStore.createTicket(formData);
 
   if (ticketStore.error) {
-    const message = typeof ticketStore.error === 'string'
-      ? ticketStore.error
-      : Object.values(ticketStore.error).flat().join(' ');
+    let message = 'Terjadi kesalahan'
+    if (typeof ticketStore.error === 'string') {
+      message = ticketStore.error
+    } else if (ticketStore.error && typeof ticketStore.error === 'object') {
+      try {
+        const values = Object.values(ticketStore.error)
+        if (values.length > 0) {
+          message = values.flat().join(' ')
+        }
+      } catch (e) {
+        message = String(ticketStore.error)
+      }
+    }
     showPopup(`Gagal membuat tiket: ${message}`, 'error');
   } else {
     showPopup("Tiket berhasil dibuat!");
