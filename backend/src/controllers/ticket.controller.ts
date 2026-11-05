@@ -58,15 +58,6 @@ function getDateRange(
   return { gte: start, lt: end }
 }
 
-function isUniqueConstraintError(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    error.code === 'P2002'
-  )
-}
-
 async function removeUploadedFile(file?: Express.Multer.File): Promise<void> {
   if (!file) return
   await fs.unlink(file.path).catch(() => undefined)
@@ -152,58 +143,47 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
   const files = (req.files as Express.Multer.File[] | undefined) ?? []
   const image = files[0] ? `tickets/${files[0].filename}` : null
 
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    try {
-      const ticket = await prisma.$transaction(async (tx) => {
-        const created = await tx.ticket.create({
-          data: {
-            code: generateTicketCode(),
-            userId: user.id,
-            title,
-            category,
-            priority,
-            description,
-            image,
-            status: 'open',
-            completedAt: null,
-          },
-        })
-
-        if (files.length > 0) {
-          await tx.ticketImage.createMany({
-            data: files.slice(0, 5).map((file) => ({
-              ticketId: created.id,
-              path: `tickets/${file.filename}`,
-            })),
-          })
-        }
-
-        return tx.ticket.findUniqueOrThrow({
-          where: { id: created.id },
-          include: { ...ticketRelations, reporter: true },
-        })
+  try {
+    const ticket = await prisma.$transaction(async (tx) => {
+      const created = await tx.ticket.create({
+        data: {
+          code: await generateTicketCode(tx),
+          userId: user.id,
+          title,
+          category,
+          priority,
+          description,
+          image,
+          status: 'open',
+          completedAt: null,
+        },
       })
 
-      success(
-        res,
-        serializeTicket(ticket, { withReplies: false }),
-        'Ticket berhasil ditambahkan',
-        201,
-      )
-      return
-    } catch (error) {
-      if (isUniqueConstraintError(error) && attempt < 4) continue
-      await removeUploadedFiles(files)
-      throw error
-    }
-  }
+      if (files.length > 0) {
+        await tx.ticketImage.createMany({
+          data: files.slice(0, 5).map((file) => ({
+            ticketId: created.id,
+            path: `tickets/${file.filename}`,
+          })),
+        })
+      }
 
-  await removeUploadedFiles(files)
-  const error = new Error('Gagal membuat kode tiket unik.') as Error & {
-    status?: number
+      return tx.ticket.findUniqueOrThrow({
+        where: { id: created.id },
+        include: { ...ticketRelations, reporter: true },
+      })
+    })
+
+    success(
+      res,
+      serializeTicket(ticket, { withReplies: false }),
+      'Ticket berhasil ditambahkan',
+      201,
+    )
+  } catch (error) {
+    await removeUploadedFiles(files)
+    throw error
   }
-  error.status = 500
-  throw error
 }
 
 export async function getTicket(req: Request, res: Response): Promise<void> {
