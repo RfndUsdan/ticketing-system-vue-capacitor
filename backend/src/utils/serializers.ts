@@ -58,6 +58,7 @@ export function serializeTicket(
     code: ticket.code,
     title: ticket.title,
     category: ticket.category,
+    location: ticket.location,
     priority: ticket.priority,
     description: ticket.description,
     status: ticket.status,

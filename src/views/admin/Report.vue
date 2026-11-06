@@ -54,14 +54,14 @@ const exportToExcel = () => {
         return;
     }
 
-    let csvContent = "\uFEFFKode Tiket,Tanggal Laporan,Pelapor,Kategori,Prioritas,Status,Judul Kerusakan\n";
+    let csvContent = "\uFEFFKode Tiket,Tanggal Laporan,Pelapor,Kategori,Lokasi,Prioritas,Status,Judul Kerusakan\n";
 
     filteredTickets.value.forEach(t => {
         const dateStr = DateTime.fromISO(t.created_at).toFormat('yyyy-MM-dd HH:mm');
         const pelapor = t.user?.name || 'Anonim';
         const title = (t.title || '').replace(/"/g, '""');
         
-        const row = `"#${t.code}","${dateStr}","${pelapor}","${t.category || 'Lainnya'}","${t.priority}","${t.status}","${title}"`;
+        const row = `"#${t.code}","${dateStr}","${pelapor}","${t.category || 'Lainnya'}","${t.location || '-'}","${t.priority}","${t.status}","${title}"`;
         csvContent += row + "\n";
     });
 
@@ -162,13 +162,14 @@ const printPDF = () => {
                             <th class="py-3 px-3 text-xs font-semibold text-gray-600 uppercase print:text-black print:py-2">Tanggal</th>
                             <th class="py-3 px-3 text-xs font-semibold text-gray-600 uppercase print:text-black print:py-2">Pelapor</th>
                             <th class="py-3 px-3 text-xs font-semibold text-gray-600 uppercase print:text-black print:py-2">Kategori</th>
+                            <th class="py-3 px-3 text-xs font-semibold text-gray-600 uppercase print:text-black print:py-2">Lokasi</th>
                             <th class="py-3 px-3 text-xs font-semibold text-gray-600 uppercase print:text-black print:py-2">Judul Kerusakan</th>
                             <th class="py-3 px-3 text-xs font-semibold text-gray-600 uppercase text-center print:text-black print:py-2">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 print:divide-gray-300">
                         <tr v-if="filteredTickets.length === 0">
-                            <td colSpan="7" class="py-8 text-center text-sm text-gray-400">
+                            <td colSpan="8" class="py-8 text-center text-sm text-gray-400">
                                 Tidak ada laporan yang sesuai dengan filter yang dipilih.
                             </td>
                         </tr>
@@ -185,6 +186,9 @@ const printPDF = () => {
                                 <span class="px-2 py-0.5 bg-gray-100 rounded text-xs border border-gray-200 print:bg-transparent print:border-none print:p-0">
                                     {{ ticket.category }}
                                 </span>
+                            </td>
+                            <td class="py-3 px-3 text-sm font-semibold text-gray-700 print:text-black print:py-2">
+                                {{ ticket.location || '-' }}
                             </td>
                             <td class="py-3 px-3 text-sm text-gray-800 max-w-xs truncate print:max-w-none print:whitespace-normal print:text-black print:py-2">
                                 {{ ticket.title }}

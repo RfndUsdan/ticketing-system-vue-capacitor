@@ -155,6 +155,9 @@
                                 <span class="text-xs text-gray-500 border-l pl-3 border-gray-200">
                                     Oleh: <span class="font-medium">{{ ticket.user?.name }}</span>
                                 </span>
+                                <span v-if="ticket.location" class="text-xs text-gray-500">
+                                    Lokasi: <span class="font-medium">{{ ticket.location }}</span>
+                                </span>
                                 <span class="text-xs text-gray-400">
                                     {{ ticket.created_at ? DateTime.fromISO(ticket.created_at).toFormat('dd LMMM yyyy, HH:mm') : '' }}
                                 </span>

@@ -103,6 +103,8 @@ onMounted(async () => {
                                 Aksi</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Kategori</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Lokasi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100">
@@ -164,6 +166,9 @@ onMounted(async () => {
                                 <span class="px-2.5 py-1 text-xs font-semibold rounded-md bg-gray-100 text-gray-700 border border-gray-200">
                                     {{ ticket.category || 'Lainnya' }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
+                                {{ ticket.location || '-' }}
                             </td>
                         </tr>
                     </tbody>

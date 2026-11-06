@@ -134,9 +134,10 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
     return
   }
 
-  const { title, category, priority, description } = req.body as {
+  const { title, category, location, priority, description } = req.body as {
     title: string
     category: string
+    location: string
     priority: string
     description: string
   }
@@ -151,6 +152,7 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
           userId: user.id,
           title,
           category,
+          location,
           priority,
           description,
           image,

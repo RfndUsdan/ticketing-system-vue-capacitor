@@ -88,6 +88,9 @@ onMounted(async () => {
                             {{ capitalize(ticket.priority) }}
                         </span>
                         <span class="text-sm text-gray-500">#{{ ticket.code }}</span>
+                        <span class="text-sm text-gray-500" v-if="ticket.location">
+                            Lokasi: {{ ticket.location }}
+                        </span>
                         <span class="text-sm text-gray-500" v-if="ticket.created_at">
                             Dibuat pada {{ DateTime.fromISO(ticket.created_at).toFormat('dd MMMM yyyy, HH:mm') }}
                         </span>

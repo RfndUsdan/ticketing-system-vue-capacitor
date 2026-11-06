@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import {
   TICKET_CATEGORIES,
+  TICKET_LOCATIONS,
   TICKET_STATUSES,
 } from '../utils/constants.js'
 
@@ -11,6 +12,7 @@ export const createTicketSchema = z.object({
     .min(1, 'Judul wajib diisi.')
     .max(255, 'Judul maksimal 255 karakter.'),
   category: z.enum(TICKET_CATEGORIES),
+  location: z.enum(TICKET_LOCATIONS),
   priority: z
     .enum(['low', 'normal', 'medium', 'high'])
     .default('medium')

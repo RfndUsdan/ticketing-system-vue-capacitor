@@ -13,6 +13,7 @@ const authStore = useAuthStore();
 const form = ref({
   title: "",
   category: "", 
+  location: "",
   priority: "medium",
   description: "",
   images: [],
@@ -46,6 +47,7 @@ const handleSubmit = async () => {
 
   formData.append("title", form.value.title);
   formData.append("category", form.value.category); 
+  formData.append("location", form.value.location);
   formData.append("priority", form.value.priority);
   formData.append("description", form.value.description);
 
@@ -161,6 +163,34 @@ onMounted(() => {
                     Administrasi & Layanan Akademik
                   </option>
                   <option value="Lainnya">Lainnya</option>
+                </select>
+                <i
+                  data-feather="chevron-down"
+                  class="absolute right-4 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"
+                ></i>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Lokasi Kerusakan</label
+              >
+              <div class="relative">
+                <select
+                  v-model="form.location"
+                  required
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-gray-50 focus:bg-white appearance-none transition-colors"
+                >
+                  <option value="" disabled>Pilih lokasi...</option>
+                  <option value="K1">Kampus 1 (K1)</option>
+                  <option value="K2">Kampus 2 (K2)</option>
+                  <option value="K3">Kampus 3 (K3)</option>
+                  <option value="LT">Lab Terpadu (LT)</option>
+                  <option value="GT">Gedung Teknik (GT)</option>
+                  <option value="PK1">Parkiran Kampus 1 (PK1)</option>
+                  <option value="PK2">Parkiran Kampus 2 (PK2)</option>
+                  <option value="PGT">Parkiran Gedung Teknik (PGT)</option>
+                  <option value="PLT">Parkiran Lab Terpadu (PLT)</option>
                 </select>
                 <i
                   data-feather="chevron-down"

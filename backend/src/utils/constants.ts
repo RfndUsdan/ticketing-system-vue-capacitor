@@ -13,5 +13,18 @@ export const TICKET_CATEGORIES = [
 ] as const
 export type TicketCategory = (typeof TICKET_CATEGORIES)[number]
 
+export const TICKET_LOCATIONS = [
+  'K1',
+  'K2',
+  'K3',
+  'LT',
+  'GT',
+  'PK1',
+  'PK2',
+  'PGT',
+  'PLT',
+] as const
+export type TicketLocation = (typeof TICKET_LOCATIONS)[number]
+
 export const USER_ROLES = ['user', 'admin'] as const
 export type UserRole = (typeof USER_ROLES)[number]
