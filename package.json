@@ -14,6 +14,7 @@
     "api:build": "npm run build --workspace @apakabar/api",
     "api:typecheck": "npm run typecheck --workspace @apakabar/api",
     "api:generate": "npm run prisma:generate --workspace @apakabar/api",
+    "api:deploy": "npm run prisma:deploy --workspace @apakabar/api",
     "api:migrate": "npm run prisma:migrate --workspace @apakabar/api --",
     "api:seed": "npm run db:seed --workspace @apakabar/api",
     "db:up": "docker compose up -d",
