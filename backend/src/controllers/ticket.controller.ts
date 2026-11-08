@@ -145,7 +145,36 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
   const image = files[0] ? `tickets/${files[0].filename}` : null
 
   try {
-    const ticket = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
+      // Lock the account row so concurrent requests cannot bypass ticket limits.
+      await tx.$queryRaw`SELECT "id" FROM "users" WHERE "id" = ${user.id} FOR UPDATE`
+
+      const now = new Date()
+      const dayStart = new Date(Date.UTC(
+        now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+      ))
+      const dayEnd = new Date(dayStart)
+      dayEnd.setUTCDate(dayEnd.getUTCDate() + 1)
+
+      const ticketsToday = await tx.ticket.count({
+        where: { userId: user.id, createdAt: { gte: dayStart, lt: dayEnd } },
+      })
+      if (ticketsToday >= 5) {
+        return { kind: 'daily-limit' as const, retryAt: dayEnd }
+      }
+
+      const latestTicket = await tx.ticket.findFirst({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+        select: { createdAt: true },
+      })
+      const nextAllowedAt = latestTicket
+        ? new Date(latestTicket.createdAt.getTime() + 60_000)
+        : null
+      if (nextAllowedAt && now < nextAllowedAt) {
+        return { kind: 'cooldown' as const, retryAt: nextAllowedAt }
+      }
+
       const created = await tx.ticket.create({
         data: {
           code: await generateTicketCode(tx),
@@ -170,15 +199,33 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
         })
       }
 
-      return tx.ticket.findUniqueOrThrow({
+      const ticket = await tx.ticket.findUniqueOrThrow({
         where: { id: created.id },
         include: { ...ticketRelations, reporter: true },
       })
+      return { kind: 'created' as const, ticket }
     })
+
+    if (result.kind !== 'created') {
+      await removeUploadedFiles(files)
+      const retryAfterSeconds = Math.max(
+        1,
+        Math.ceil((result.retryAt.getTime() - Date.now()) / 1000),
+      )
+      res.setHeader('Retry-After', String(retryAfterSeconds))
+      res.status(429).json({
+        message: result.kind === 'daily-limit'
+          ? 'Batas 5 tiket per hari telah tercapai. Silakan coba lagi besok.'
+          : 'Tunggu 1 menit sebelum membuat tiket berikutnya.',
+        retry_after_seconds: retryAfterSeconds,
+        retry_at: result.retryAt.toISOString(),
+      })
+      return
+    }
 
     success(
       res,
-      serializeTicket(ticket, { withReplies: false }),
+      serializeTicket(result.ticket, { withReplies: false }),
       'Ticket berhasil ditambahkan',
       201,
     )
