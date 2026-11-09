@@ -38,6 +38,8 @@ model Ticket {
   id          Int       @id @default(autoincrement())
   code        String    @unique
   userId      Int       @map("user_id")
+  idempotencyKey  String? @map("idempotency_key") @db.VarChar(100)
+  idempotencyHash String? @map("idempotency_hash") @db.Char(64)
   title       String
   category    String    @default("Lainnya")
   location    String    @default("K1")
@@ -59,6 +61,7 @@ model Ticket {
   @@index([createdAt])
   @@index([userId])
   @@index([deletedAt])
+  @@unique([userId, idempotencyKey])
   @@map("tickets")
 }
 

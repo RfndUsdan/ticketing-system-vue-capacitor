@@ -44,12 +44,14 @@ export const useTicketStore = defineStore("ticket", {
             }
         },
 
-        async createTicket(payload) {
+        async createTicket(payload, idempotencyKey) {
             this.loading = true
             this.error = null 
 
             try {
-                const response = await axiosInstance.post("/ticket", payload)
+                const response = await axiosInstance.post("/ticket", payload, {
+                    headers: { 'Idempotency-Key': idempotencyKey },
+                })
 
                 this.success = response.data.message
 

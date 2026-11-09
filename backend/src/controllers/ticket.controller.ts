@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import type { Request, Response } from 'express'
 import type { Prisma } from '../generated/prisma/client.js'
 import { prisma } from '../config/prisma.js'
@@ -143,11 +144,36 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
   }
   const files = (req.files as Express.Multer.File[] | undefined) ?? []
   const image = files[0] ? `tickets/${files[0].filename}` : null
+  const idempotencyKey = req.get('Idempotency-Key')?.trim()
+
+  if (!idempotencyKey || !/^[0-9a-f-]{36}$/i.test(idempotencyKey)) {
+    await removeUploadedFiles(files)
+    res.status(400).json({ message: 'Header Idempotency-Key wajib berisi UUID yang valid.' })
+    return
+  }
+
+  const payloadHash = createHash('sha256')
+    .update(JSON.stringify({ title, category, location, priority, description }))
+  for (const file of files) {
+    payloadHash.update(file.mimetype)
+    payloadHash.update(await fs.readFile(file.path))
+  }
+  const idempotencyHash = payloadHash.digest('hex')
 
   try {
     const result = await prisma.$transaction(async (tx) => {
       // Lock the account row so concurrent requests cannot bypass ticket limits.
       await tx.$queryRaw`SELECT "id" FROM "users" WHERE "id" = ${user.id} FOR UPDATE`
+
+      const previousRequest = await tx.ticket.findFirst({
+        where: { userId: user.id, idempotencyKey },
+        include: { ...ticketRelations, reporter: true },
+      })
+      if (previousRequest) {
+        return previousRequest.idempotencyHash === idempotencyHash
+          ? { kind: 'replay' as const, ticket: previousRequest }
+          : { kind: 'key-conflict' as const }
+      }
 
       const now = new Date()
       const dayStart = new Date(Date.UTC(
@@ -179,6 +205,8 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
         data: {
           code: await generateTicketCode(tx),
           userId: user.id,
+          idempotencyKey,
+          idempotencyHash,
           title,
           category,
           location,
@@ -205,6 +233,22 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
       })
       return { kind: 'created' as const, ticket }
     })
+
+    if (result.kind === 'key-conflict') {
+      await removeUploadedFiles(files)
+      res.status(409).json({ message: 'Idempotency-Key sudah digunakan untuk data tiket yang berbeda.' })
+      return
+    }
+    if (result.kind === 'replay') {
+      await removeUploadedFiles(files)
+      success(
+        res,
+        serializeTicket(result.ticket, { withReplies: false }),
+        'Tiket sebelumnya berhasil dibuat',
+        201,
+      )
+      return
+    }
 
     if (result.kind !== 'created') {
       await removeUploadedFiles(files)

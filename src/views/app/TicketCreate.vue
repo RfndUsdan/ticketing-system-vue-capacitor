@@ -21,6 +21,7 @@ const form = ref({
 });
 
 const imagePreviews = ref([]);
+const idempotencyKey = ref(crypto.randomUUID());
 
 const handleImageCapture = (event) => {
   const files = Array.from(event.target.files || []);
@@ -43,6 +44,8 @@ const removeImage = (index) => {
 };
 
 const handleSubmit = async () => {
+  if (ticketStore.loading) return;
+
   const formData = new FormData();
 
   formData.append("title", form.value.title);
@@ -55,7 +58,7 @@ const handleSubmit = async () => {
     formData.append("images", file);
   });
 
-  await ticketStore.createTicket(formData);
+  await ticketStore.createTicket(formData, idempotencyKey.value);
 
   if (ticketStore.error) {
     let message = 'Terjadi kesalahan'
