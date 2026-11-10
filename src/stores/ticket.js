@@ -44,19 +44,26 @@ export const useTicketStore = defineStore("ticket", {
             }
         },
 
-        async createTicket(payload, idempotencyKey) {
+        async createTicket(payload, idempotencyKey, allowDuplicate = false) {
             this.loading = true
             this.error = null 
 
             try {
                 const response = await axiosInstance.post("/ticket", payload, {
-                    headers: { 'Idempotency-Key': idempotencyKey },
+                    headers: {
+                        'Idempotency-Key': idempotencyKey,
+                        'X-Allow-Duplicate': String(allowDuplicate),
+                    },
                 })
 
                 this.success = response.data.message
 
                 return response.data.data
             } catch (error) {
+                if (error.response?.data?.code === 'DUPLICATE_TICKET') {
+                    this.error = null
+                    return { duplicate: error.response.data.duplicate }
+                }
                 this.error = handleError(error)
             } finally {
                 this.loading = false

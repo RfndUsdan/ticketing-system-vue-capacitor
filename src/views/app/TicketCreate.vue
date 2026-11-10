@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import { useTicketStore } from "@/stores/ticket";
 import { useAuthStore } from "@/stores/auth"; 
 import feather from "feather-icons";
-import { showPopup } from "@/helpers/popup";
+import { confirmPopup, showPopup } from "@/helpers/popup";
 
 const router = useRouter();
 const ticketStore = useTicketStore();
@@ -58,7 +58,24 @@ const handleSubmit = async () => {
     formData.append("images", file);
   });
 
-  await ticketStore.createTicket(formData, idempotencyKey.value);
+  let result = await ticketStore.createTicket(formData, idempotencyKey.value);
+
+  if (result?.duplicate) {
+    const createAnyway = await confirmPopup(
+      `Tiket #${result.duplicate.code} dengan laporan serupa baru dibuat. Tetap buat tiket baru? Jika dibatalkan, Anda akan diarahkan ke tiket tersebut.`,
+      "Kemungkinan tiket duplikat",
+    );
+
+    if (!createAnyway) {
+      router.push({
+        name: "app.ticket.detail",
+        params: { code: result.duplicate.code },
+      });
+      return;
+    }
+
+    result = await ticketStore.createTicket(formData, idempotencyKey.value, true);
+  }
 
   if (ticketStore.error) {
     let message = 'Terjadi kesalahan'

@@ -69,6 +69,15 @@ async function removeUploadedFiles(files?: Express.Multer.File[]): Promise<void>
   await Promise.all(files.map((file) => fs.unlink(file.path).catch(() => undefined)))
 }
 
+function normalizeForDuplicateCheck(value: string): string {
+  return value
+    .normalize('NFKC')
+    .toLocaleLowerCase('id-ID')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+    .replace(/\s+/g, ' ')
+}
+
 export async function listTickets(req: Request, res: Response): Promise<void> {
   const user = req.user
   if (!user) {
@@ -159,6 +168,7 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
     payloadHash.update(await fs.readFile(file.path))
   }
   const idempotencyHash = payloadHash.digest('hex')
+  const allowDuplicate = req.get('X-Allow-Duplicate') === 'true'
 
   try {
     const result = await prisma.$transaction(async (tx) => {
@@ -176,6 +186,35 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
       }
 
       const now = new Date()
+      const duplicateWindowStart = new Date(now.getTime() - 10 * 60_000)
+      const recentTickets = await tx.ticket.findMany({
+        where: {
+          userId: user.id,
+          deletedAt: null,
+          createdAt: { gte: duplicateWindowStart, lte: now },
+          category,
+          location,
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+        select: {
+          code: true,
+          title: true,
+          description: true,
+          createdAt: true,
+        },
+      })
+      const normalizedTitle = normalizeForDuplicateCheck(title)
+      const normalizedDescription = normalizeForDuplicateCheck(description)
+      const duplicate = recentTickets.find((ticket) =>
+        normalizeForDuplicateCheck(ticket.title) === normalizedTitle &&
+        normalizeForDuplicateCheck(ticket.description) === normalizedDescription,
+      )
+
+      if (duplicate && !allowDuplicate) {
+        return { kind: 'duplicate' as const, ticket: duplicate }
+      }
+
       const dayStart = new Date(Date.UTC(
         now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
       ))
@@ -237,6 +276,19 @@ export async function createTicket(req: Request, res: Response): Promise<void> {
     if (result.kind === 'key-conflict') {
       await removeUploadedFiles(files)
       res.status(409).json({ message: 'Idempotency-Key sudah digunakan untuk data tiket yang berbeda.' })
+      return
+    }
+    if (result.kind === 'duplicate') {
+      await removeUploadedFiles(files)
+      res.status(409).json({
+        code: 'DUPLICATE_TICKET',
+        message: 'Ditemukan tiket serupa yang baru dibuat.',
+        duplicate: {
+          code: result.ticket.code,
+          title: result.ticket.title,
+          created_at: result.ticket.createdAt.toISOString(),
+        },
+      })
       return
     }
     if (result.kind === 'replay') {
