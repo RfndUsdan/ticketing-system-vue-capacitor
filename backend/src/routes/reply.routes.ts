@@ -2,6 +2,7 @@ import { Router, type Request } from 'express'
 import { createReply } from '../controllers/ticket.controller.js'
 import { authenticate } from '../middlewares/auth.js'
 import { validate } from '../middlewares/validate.js'
+import { replyCreateLimit } from '../middlewares/rate-limit.js'
 import {
   createAdminReplySchema,
   createReplySchema,
@@ -13,6 +14,7 @@ const router = Router()
 router.post(
   '/:code',
   authenticate,
+  replyCreateLimit,
   (req: Request, res, next) => {
     const schema =
       req.user?.role === 'admin' ? createAdminReplySchema : createReplySchema

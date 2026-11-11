@@ -8,6 +8,7 @@ import {
 import { authenticate, requireAdmin } from '../middlewares/auth.js'
 import { uploadTicketImage } from '../middlewares/upload.js'
 import { validate } from '../middlewares/validate.js'
+import { ticketCreateLimit, ticketDeleteLimit, ticketDetailLimit, ticketListLimit } from '../middlewares/rate-limit.js'
 import {
   createTicketSchema,
   listTicketsQuerySchema,
@@ -17,9 +18,9 @@ const router = Router()
 
 router.use(authenticate)
 
-router.get('/', validate(listTicketsQuerySchema, 'query'), listTickets)
-router.post('/', uploadTicketImage, validate(createTicketSchema), createTicket)
-router.get('/:code', getTicket)
-router.delete('/:code', requireAdmin, deleteTicket)
+router.get('/', ticketListLimit, validate(listTicketsQuerySchema, 'query'), listTickets)
+router.post('/', ticketCreateLimit, uploadTicketImage, validate(createTicketSchema), createTicket)
+router.get('/:code', ticketDetailLimit, getTicket)
+router.delete('/:code', ticketDeleteLimit, requireAdmin, deleteTicket)
 
 export default router
