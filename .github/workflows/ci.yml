@@ -7,6 +7,25 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: apakabar_test
+          POSTGRES_USER: apakabar
+          POSTGRES_PASSWORD: apakabar_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U apakabar -d apakabar_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://apakabar:apakabar_test_password@localhost:5432/apakabar_test
+      JWT_SECRET: integration-test-secret-at-least-32-characters-long
+      BCRYPT_ROUNDS: 4
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,8 +42,17 @@ jobs:
       - name: Run backend tests
         run: npm run test --workspace @apakabar/api
 
+      - name: Apply database migrations
+        run: npm run prisma:deploy --workspace @apakabar/api
+
+      - name: Run API and database integration tests
+        run: npm run test:integration --workspace @apakabar/api
+
       - name: Check backend types
         run: npm run api:typecheck
+
+      - name: Check test types
+        run: npm run test:typecheck --workspace @apakabar/api
 
       - name: Build backend
         run: npm run api:build

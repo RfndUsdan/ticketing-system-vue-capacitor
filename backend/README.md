@@ -107,6 +107,39 @@ Akun seed:
 | Admin | `admin@apakabar.local` | `Admin123!` |
 | Mahasiswa | `mahasiswa@apakabar.local` | `User123!` |
 
+---
+
+## Pengujian otomatis dan integrasi database
+
+Pengujian unit tidak membutuhkan database:
+
+```bash
+npm run test --workspace @apakabar/api
+```
+
+Pengujian integrasi membuat akun uji, mengirim request ke API, dan memeriksa penyimpanan tiket,
+gambar, balasan, status, serta otorisasi di PostgreSQL. **Gunakan database khusus berakhiran
+`_test`; test sengaja menolak URL database dengan nama lain.** Dari root repository, jalankan:
+
+```bash
+docker compose -f docker-compose.test.yml up -d
+```
+
+PowerShell:
+
+```powershell
+$env:NODE_ENV = 'test'
+$env:DATABASE_URL = 'postgresql://apakabar:apakabar_test_password@localhost:5433/apakabar_test'
+$env:JWT_SECRET = 'integration-test-secret-at-least-32-characters-long'
+$env:BCRYPT_ROUNDS = '4'
+npm run prisma:deploy --workspace @apakabar/api
+npm run test:integration --workspace @apakabar/api
+```
+
+Linux/macOS: set environment variables dengan nilai yang sama sebelum menjalankan dua perintah
+`npm run` tersebut. CI menjalankan test integrasi terhadap service PostgreSQL sementara yang
+terpisah; test tidak memerlukan seed data.
+
 > Jika `npm run api:migrate -- --name init` tidak meneruskan argumen dengan benar
 > di shell tertentu, jalankan langsung dari folder backend:
 > `cd backend && npm run prisma:migrate -- --name init`
