@@ -118,7 +118,7 @@ npm run test --workspace @apakabar/api
 ```
 
 Pengujian integrasi membuat akun uji, mengirim request ke API, dan memeriksa penyimpanan tiket,
-gambar, balasan, status, serta otorisasi di PostgreSQL. **Gunakan database khusus berakhiran
+gambar, penolakan format/ukuran gambar tidak valid, balasan, status, serta otorisasi di PostgreSQL. **Gunakan database khusus berakhiran
 `_test`; test sengaja menolak URL database dengan nama lain.** Dari root repository, jalankan:
 
 ```bash

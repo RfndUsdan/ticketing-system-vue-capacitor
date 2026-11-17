@@ -90,12 +90,45 @@ test('API persists tickets, images, replies and status, and enforces ticket owne
     otherUserId = otherRegistration.body.data.user.id
     const otherToken = otherRegistration.body.data.token as string
 
-    const form = new FormData()
-    form.set('title', 'Integration test ticket')
-    form.set('category', 'Fasilitas')
-    form.set('location', 'K1')
-    form.set('priority', 'high')
-    form.set('description', 'Tiket untuk pengujian integrasi database.')
+    const ticketFields = (form: FormData) => {
+      form.set('title', 'Integration test ticket')
+      form.set('category', 'Fasilitas')
+      form.set('location', 'K1')
+      form.set('priority', 'high')
+      form.set('description', 'Tiket untuk pengujian integrasi database.')
+      return form
+    }
+
+    const unsupportedImageForm = ticketFields(new FormData())
+    unsupportedImageForm.set(
+      'image',
+      new Blob(['not an allowed image type'], { type: 'image/gif' }),
+      'unsupported.gif',
+    )
+    const unsupportedImage = await request('/ticket', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${reporterToken}`, 'Idempotency-Key': randomUUID() },
+      body: unsupportedImageForm,
+    })
+    assert.equal(unsupportedImage.status, 422)
+    assert.match(unsupportedImage.body.message ?? '', /JPG, PNG, atau WEBP/i)
+
+    const tooLargeImageForm = ticketFields(new FormData())
+    const uploadLimitBytes = 10 * 1024 * 1024
+    tooLargeImageForm.set(
+      'image',
+      new Blob([new Uint8Array(uploadLimitBytes + 1)], { type: 'image/png' }),
+      'too-large.png',
+    )
+    const tooLargeImage = await request('/ticket', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${reporterToken}`, 'Idempotency-Key': randomUUID() },
+      body: tooLargeImageForm,
+    })
+    assert.equal(tooLargeImage.status, 422)
+    assert.match(tooLargeImage.body.message ?? '', /maksimal 10 MB/i)
+
+    const form = ticketFields(new FormData())
     form.set('image', new Blob(['test image content'], { type: 'image/png' }), 'evidence.png')
     const idempotencyKey = randomUUID()
     const created = await request('/ticket', {
