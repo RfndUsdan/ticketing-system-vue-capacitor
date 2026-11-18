@@ -45,7 +45,7 @@
 
 ### Mengapa Apa Kabar relevan sebagai solusi mobile?
 
-Apa Kabar merupakan aplikasi ticketing untuk membantu pengguna menyampaikan laporan kerusakan barang atau fasilitas, melampirkan bukti foto, serta memantau perkembangan laporan. Dari sisi pengelola, sistem membantu petugas menerima, memeriksa, dan memperbarui status tiket secara lebih terpusat.
+Apa Kabar merupakan aplikasi ticketing untuk membantu pengguna menyampaikan laporan kerusakan barang atau fasilitas, melampirkan bukti foto (hingga beberapa gambar), serta memantau perkembangan laporan. Dari sisi pengelola, sistem membantu petugas menerima, memeriksa, dan memperbarui status tiket secara lebih terpusat.
 
 Arsitektur aktif proyek menggunakan **Vue.js + Vite** untuk antarmuka, **Node.js + Express 5 + TypeScript** sebagai REST API, **Prisma 7 + PostgreSQL** untuk akses dan penyimpanan data, serta **Capacitor** untuk membungkus aplikasi menjadi aplikasi Android. Laravel 12/MySQL merupakan arsitektur backend lama dan referensi historis, bukan backend aktif saat ini. Fokus dokumen tetap pada kebutuhan pengguna, alur kerja, karakteristik mobile, dan target yang dapat diuji.
 
@@ -58,7 +58,7 @@ Arsitektur aktif proyek menggunakan **Vue.js + Vite** untuk antarmuka, **Node.js
 
 > **🎯 Ruang lingkup**
 >
-> Autentikasi, pembuatan laporan, lampiran gambar, daftar/detail tiket, pemantauan status, serta peran pengelola sesuai implementasi yang benar-benar ada.
+> Autentikasi, pembuatan laporan (termasuk lokasi), lampiran gambar (hingga 5 gambar per tiket), daftar/detail tiket, pemantauan status, balasan/tindak lanjut, serta peran pengelola sesuai implementasi yang benar-benar ada.
 
 ### Alur utama aplikasi
 
@@ -145,20 +145,20 @@ Apa Kabar ditawarkan sebagai aplikasi Android untuk mengirim laporan dan memanta
 
 | Lapisan | Komponen | Tanggung jawab |
 |---|---|---|
-| **Mobile UI** | Vue.js + Capacitor | Login, formulir laporan, daftar/detail tiket, dan interaksi pengguna. |
-| **API** | Node.js + Express 5 + TypeScript | Autentikasi, validasi, proses bisnis, otorisasi, dan respons data. |
-| **Database** | PostgreSQL melalui Prisma 7 | Menyimpan akun, tiket, status, dan metadata lampiran. |
-| **Berkas** | Storage gambar | Menyimpan foto secara persisten, idealnya pada layanan object storage atau disk yang sesuai. |
+| **Mobile UI** | Vue.js + Capacitor | Login, formulir laporan, daftar/detail tiket, balasan, dan interaksi pengguna. |
+| **API** | Node.js + Express 5 + TypeScript | Autentikasi, validasi, proses bisnis (termasuk deteksi duplikat, cooldown, batas harian), otorisasi, rate limiting, dan respons data. |
+| **Database** | PostgreSQL melalui Prisma 7 | Menyimpan akun, tiket, balasan, status, dan metadata lampiran (termasuk relasi multi-gambar). |
+| **Berkas** | Storage gambar lokal | Menyimpan foto di `backend/storage` dan menyajikannya melalui endpoint `/storage`. Untuk produksi, dapat dipindahkan ke object storage/disk persisten. |
 
-> **Status implementasi:** source backend aktif berada di `backend/`. Frontend Vue memakai `VITE_API_BASE_URL` untuk mengakses API baru. Source PHP Laravel lama tidak disertakan di workspace ini. Integrasi end-to-end pada browser/perangkat Android dan konfigurasi Capacitor masih perlu diuji.
+> **Status implementasi:** source backend aktif berada di `backend/`. Frontend Vue memakai `VITE_API_BASE_URL` untuk mengakses API. Source PHP Laravel lama tidak disertakan di workspace ini. Integrasi end-to-end pada browser/perangkat Android dan konfigurasi build Capacitor tetap perlu diuji pada lingkungan target.
 
-### Alur status tiket yang diusulkan
+### Alur status tiket (implementasi saat ini)
 
-**Menunggu** → **Diverifikasi** → **Diproses** → **Selesai** / **Ditolak**
+**`open` (Dibuka)** → **`in_progress` (Diproses)** → **`resolved` (Selesai)** / **`rejected` (Ditolak)**
 
 > **ℹ️ Catatan**
 >
-> Nama status di atas adalah usulan untuk menggambarkan alur. Sesuaikan dengan nilai enum/kolom status yang benar-benar ada pada repository sebelum dipakai sebagai spesifikasi final.
+> Nilai status di atas mengikuti implementasi backend saat ini (`open`, `in_progress`, `resolved`, `rejected`). Jika alur bisnis membutuhkan tahap verifikasi terpisah, penyesuaian skema dan logika status perlu dilakukan secara eksplisit.
 
 ---
 
@@ -168,19 +168,21 @@ Apa Kabar ditawarkan sebagai aplikasi Android untuk mengirim laporan dan memanta
 
 | Pengguna | Tujuan | Kebutuhan utama |
 |---|---|---|
-| **Pelapor** (mahasiswa / pengguna fasilitas) | Melaporkan kerusakan dan mengetahui perkembangan. | Login; formulir yang mudah; unggah foto; daftar/detail tiket; status yang jelas. |
-| **Petugas** (admin pengelola) | Memeriksa laporan dan mengatur tindak lanjut. | Melihat tiket dan lampiran; memperbarui status; mengelola data sesuai kewenangan. |
+| **Pelapor** (mahasiswa / pengguna fasilitas) | Melaporkan kerusakan dan mengetahui perkembangan. | Login; formulir laporan (termasuk lokasi) yang mudah; unggah hingga beberapa foto bukti; daftar/detail tiket; balasan; status yang jelas. |
+| **Petugas** (admin pengelola) | Memeriksa laporan dan mengatur tindak lanjut. | Melihat tiket, lampiran, dan riwayat balasan; memperbarui status; memberikan tanggapan; mengelola data sesuai kewenangan. |
 
 ### Kebutuhan fungsional
 
 | ID | Kebutuhan | Prioritas | Kriteria penerimaan awal |
 |---|---|---|---|
 | **KF-01** | Login dan logout pengguna. | **Tinggi** | Kredensial valid membuka sesi; kredensial salah menghasilkan pesan yang jelas. |
-| **KF-02** | Membuat tiket/laporan. | **Tinggi** | Field wajib divalidasi; laporan yang berhasil tersimpan muncul pada daftar/detail. |
-| **KF-03** | Menambahkan foto bukti. | **Tinggi** | Jenis dan ukuran file divalidasi; foto dapat dilihat kembali setelah terkirim. |
+| **KF-02** | Membuat tiket/laporan. | **Tinggi** | Field wajib (mis. judul, kategori, lokasi, prioritas, deskripsi) divalidasi; laporan berhasil tersimpan dan muncul pada daftar/detail. |
+| **KF-03** | Menambahkan foto bukti. | **Tinggi** | Mendukung hingga 5 gambar per tiket (format `JPG/PNG/WEBP`, maks. 10 MB per file); gambar tersimpan dan dapat dilihat kembali pada detail tiket. |
 | **KF-04** | Melihat daftar dan detail tiket. | **Tinggi** | Data sesuai akun dan izin akses pengguna. |
-| **KF-05** | Memantau status tiket. | **Tinggi** | Status mengikuti nilai terakhir dari server. |
+| **KF-05** | Memantau status tiket. | **Tinggi** | Status mengikuti nilai terakhir dari server (`open`, `in_progress`, `resolved`, `rejected`). |
 | **KF-06** | Petugas meninjau tiket dan memperbarui status. | **Tinggi** | Perubahan tersimpan dan terlihat oleh pelapor yang berwenang. |
+| **KF-07** | Balasan/tindak lanjut tiket. | **Sedang** | Pengguna/petugas dapat mengirim balasan sesuai hak akses; riwayat balasan tampil pada detail tiket. |
+| **KF-08** | Pencegahan duplikat & pembatasan pengiriman. | **Sedang** | Sistem mendeteksi tiket serupa dalam jendela waktu tertentu, memberi opsi konfirmasi, serta menerapkan cooldown/batas harian dan rate limit untuk mencegah pengiriman berulang/berlebihan. |
 
 ---
 
@@ -193,11 +195,11 @@ Pelaporan bisa dilakukan langsung di lokasi kejadian. Karena itu, antarmuka perl
 | Karakteristik | Implikasi pada Apa Kabar | Kebutuhan desain / pengujian |
 |---|---|---|
 | **Layar dan ukuran beragam** | Formulir dan teks harus terbaca tanpa terpotong. | Uji beberapa ukuran layar; label jelas dan tombol mudah disentuh. |
-| **Kamera dan galeri** | Pengguna memerlukan bukti visual kerusakan. | Uji izin akses, pemilihan gambar, preview, ukuran file, dan pesan gagal. |
-| **Koneksi berubah-ubah** | Request API dapat gagal atau lambat. | Tampilkan loading/error; cegah submit ganda; sediakan coba lagi; konfirmasi sukses hanya setelah respons server. |
+| **Kamera dan galeri** | Pengguna memerlukan bukti visual kerusakan (bisa lebih dari satu sudut). | Uji izin akses, pemilihan satu/beberapa gambar, preview & hapus per gambar, batas jumlah/ukuran/format, dan pesan gagal. |
+| **Koneksi berubah-ubah** | Request API dapat gagal, lambat, atau terkirim ulang. | Tampilkan loading/error; cegah submit ganda; sediakan coba lagi; konfirmasi sukses hanya setelah respons server; manfaatkan idempotency untuk mencegah tiket ganda saat retry. |
 | **Siklus aplikasi** | OS dapat menghentikan proses aplikasi. | Muat ulang status dari API; jangan mengandalkan memori layar untuk data penting. |
-| **Keamanan dan privasi** | Foto dan isi laporan dapat bersifat sensitif. | Gunakan HTTPS, otorisasi backend, hindari token di log, dan batasi akses file. |
-| **Data dan baterai** | Foto besar bisa memperlambat unggahan. | Batasi ukuran foto dan hindari request berulang yang tidak perlu. |
+| **Keamanan dan privasi** | Foto dan isi laporan dapat bersifat sensitif. | Gunakan HTTPS, otorisasi backend, hindari token di log, batasi akses file, dan terapkan rate limiting. |
+| **Data, baterai, dan spam** | Foto besar dan pengiriman berulang membebani jaringan/server. | Batasi ukuran/jumlah foto, deteksi tiket duplikat, terapkan cooldown/batas harian, dan hindari request berulang yang tidak perlu. |
 
 > **⚠️ Batasan yang perlu diverifikasi**
 >
@@ -234,10 +236,10 @@ Spesifikasi pengembang merangkum kebutuhan perangkat lunak dan layanan yang digu
 ### Prasyarat operasional
 
 - Repository frontend/backend teridentifikasi dengan jelas dan rahasia tidak disimpan di Git.
-- URL API dikelola melalui konfigurasi environment, bukan tersebar di banyak file.
-- Skema database dapat direproduksi melalui migration dan memiliki backup sebelum perubahan data.
-- Storage foto tetap tersedia setelah deployment ulang.
-- Build Android diuji kembali setelah perubahan URL API atau konfigurasi Capacitor.
+- URL API dikelola melalui konfigurasi environment (`VITE_API_BASE_URL`, `PUBLIC_BASE_URL`, dsb.), bukan tersebar di banyak file.
+- Skema database dapat direproduksi melalui migration Prisma dan memiliki backup sebelum perubahan data.
+- Storage foto (lokal `backend/storage` atau storage persisten lain) tetap tersedia dan dapat diakses setelah deployment ulang.
+- Build Android diuji kembali setelah perubahan URL API, konfigurasi Capacitor, atau perilaku upload/lampiran.
 
 ---
 
@@ -247,21 +249,22 @@ Spesifikasi pengembang merangkum kebutuhan perangkat lunak dan layanan yang digu
 
 | Target | Indikator berhasil | Cara verifikasi |
 |---|---|---|
-| **Pelaporan terstruktur** | Pengguna mengisi field wajib dan mengirim tiket dengan respons yang jelas. | Uji data valid/tidak valid dan cek data tersimpan. |
-| **Lampiran bukti** | Foto dapat dilihat kembali setelah aplikasi ditutup dan dibuka. | Uji unggah, buka detail, restart aplikasi, cek persistence. |
-| **Pelacakan status** | Daftar/detail menunjukkan status terbaru dari server. | Ubah status melalui peran petugas, lalu verifikasi dari akun pelapor. |
-| **Kesesuaian mobile** | Layar tidak terpotong dan kontrol utama dapat digunakan. | Uji pada perangkat dengan ukuran layar yang tersedia. |
-| **Koneksi dan error** | Kegagalan jaringan tidak menghasilkan konfirmasi sukses palsu. | Putuskan jaringan saat request, lalu pulihkan dan coba ulang. |
-| **Keamanan akses** | Pengguna hanya mengakses data sesuai otorisasinya. | Uji token tidak valid dan akses ke tiket pengguna lain. |
+| **Pelaporan terstruktur** | Pengguna mengisi field wajib (termasuk lokasi) dan mengirim tiket dengan respons yang jelas. | Uji data valid/tidak valid dan cek data tersimpan. |
+| **Lampiran bukti** | Hingga 5 foto (sesuai batas format/ukuran) dapat dilihat kembali setelah aplikasi ditutup dan dibuka. | Uji unggah tunggal/multi-gambar, buka detail (user/admin), restart aplikasi, dan cek persistence storage. |
+| **Pelacakan status & balasan** | Daftar/detail menunjukkan status terbaru dari server dan riwayat balasan tampil sesuai hak akses. | Ubah status/balas tiket melalui peran petugas, lalu verifikasi dari akun pelapor. |
+| **Kesesuaian mobile** | Layar tidak terpotong dan kontrol utama (termasuk pilih kamera/galeri & preview multi-gambar) dapat digunakan. | Uji pada perangkat/ukuran layar berbeda, termasuk izin kamera/galeri. |
+| **Koneksi dan error** | Kegagalan jaringan atau request ulang tidak menghasilkan konfirmasi sukses palsu/tiket ganda. | Putuskan jaringan saat request, coba lagi, dan verifikasi perilaku loading/error/idempotency. |
+| **Pencegahan duplikat & pembatasan** | Sistem memberi peringatan duplikat, opsi konfirmasi, serta menolak pengiriman yang melanggar cooldown/batas harian/rate limit dengan pesan jelas. | Uji tiket serupa beruntun, submit cepat berulang, dan pembuatan tiket hingga melewati batas yang ditetapkan. |
+| **Keamanan akses** | Pengguna hanya mengakses data sesuai otorisasinya. | Uji token tidak valid, akses ke tiket pengguna lain, dan respons 401/403 yang sesuai. |
 
 ### Target nonfungsional awal
 
 | Aspek | Target |
 |---|---|
-| **Usability** | Alur membuat laporan singkat; instruksi dan validasi mudah dipahami. |
-| **Reliability** | Status loading, sukses, dan gagal ditampilkan secara eksplisit. |
-| **Security** | HTTPS pada produksi, validasi server-side, dan kontrol akses. |
-| **Maintainability** | URL API dan rahasia dipisahkan dari source code. |
+| **Usability** | Alur membuat laporan singkat; instruksi, validasi, dan pesan error mudah dipahami. |
+| **Reliability** | Status loading, sukses, dan gagal ditampilkan secara eksplisit; pencegahan duplikat/cooldown/batas harian membantu menghindari pengiriman berulang. |
+| **Security** | HTTPS pada produksi, validasi server-side, kontrol akses, dan rate limiting untuk mencegah penyalahgunaan. |
+| **Maintainability** | URL API, rahasia, dan konfigurasi environment dipisahkan dari source code. |
 
 > **📝 Lengkapi dengan data nyata**
 >
