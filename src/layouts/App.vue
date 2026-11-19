@@ -1,7 +1,19 @@
 <script setup>
+import { onMounted, onUnmounted } from 'vue';
 import Navbar from '@/components/app/Navbar.vue'; // (Sesuaikan path ini seperti yang sudah benar sebelumnya)
 import MobileBottomNav from '@/components/app/MobileBottomNav.vue';
 import Footer from '@/components/app/Footer.vue'; // 1. Import Footer di sini
+import { useNotificationStore } from '@/stores/notification';
+
+const notificationStore = useNotificationStore();
+
+onMounted(() => {
+    notificationStore.startPolling();
+});
+
+onUnmounted(() => {
+    notificationStore.stopPolling();
+});
 </script>
 
 <template>

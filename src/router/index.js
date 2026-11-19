@@ -14,6 +14,8 @@ import App from '@/layouts/App.vue'
 import AppDashboard from '@/views/app/Dashboard.vue'
 import AppTicketDetail from '@/views/app/TicketDetail.vue'
 import AppTicketCreate from '@/views/app/TicketCreate.vue'
+import AppNotifications from '@/views/app/Notifications.vue'
+import AdminNotifications from '@/views/admin/Notifications.vue'
 import Register from '@/views/auth/Register.vue'
 import Cookies from 'js-cookie'
 import { showPopup } from '@/helpers/popup'
@@ -53,6 +55,12 @@ const router = createRouter({
           path: 'ticket/create',
           name: 'app.ticket.create',
           component: AppTicketCreate,
+        },
+        {
+          path: 'notifications',
+          name: 'app.notifications',
+          component: AppNotifications,
+          meta: { requiresAuth: true, title: 'Notifikasi' },
         },
       ],
     },
@@ -107,6 +115,12 @@ const router = createRouter({
           component: () => import('@/views/admin/Report.vue'),
           meta: { requiresAuth: true, isAdmin: true, title: 'Laporan' }, 
       },
+        {
+          path: 'notifications',
+          name: 'admin.notifications',
+          component: AdminNotifications,
+          meta: { requiresAuth: true, isAdmin: true, title: 'Notifikasi' },
+        },
       ],
     },
     {

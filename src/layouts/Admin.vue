@@ -1,5 +1,27 @@
 <script setup>
+import { onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import feather from 'feather-icons'
 import Sidebar from '@/components/admin/Sidebar.vue'
+import { useNotificationStore } from '@/stores/notification'
+
+const route = useRoute()
+const notificationStore = useNotificationStore()
+const { unreadCount } = storeToRefs(notificationStore)
+
+onMounted(() => {
+    notificationStore.startPolling()
+    nextTick(() => feather.replace())
+})
+
+onUnmounted(() => {
+    notificationStore.stopPolling()
+})
+
+watch([unreadCount, () => route.fullPath], () => {
+    nextTick(() => feather.replace())
+})
 </script>
 
 <template>
@@ -14,10 +36,15 @@ import Sidebar from '@/components/admin/Sidebar.vue'
                 <div class="flex items-center justify-between px-6 py-4">
                     <h2 class="text-xl font-semibold text-gray-800">{{ $route.meta.title }}</h2>
                     <div class="flex items-center space-x-4">
-                        <button class="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full">
+                        <RouterLink :to="{ name: 'admin.notifications' }"
+                            class="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full"
+                            title="Notifikasi">
                             <i data-feather="bell" class="w-6 h-6"></i>
-                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
+                            <span v-if="unreadCount > 0"
+                                class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                {{ unreadCount > 99 ? '99+' : unreadCount }}
+                            </span>
+                        </RouterLink>
                         <div class="flex items-center bg-gray-50 px-4 py-2 rounded-full">
                             <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="Profile"
                                 class="w-8 h-8 rounded-full">

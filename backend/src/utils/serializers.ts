@@ -1,4 +1,4 @@
-import type { Ticket, TicketReply, User } from '../generated/prisma/client.js'
+import type { Notification, Ticket, TicketReply, User } from '../generated/prisma/client.js'
 import { env } from '../config/env.js'
 
 const publicBaseUrl = env.PUBLIC_BASE_URL.replace(/\/+$/, '')
@@ -35,6 +35,18 @@ export function serializeReply(reply: TicketReply & { user: User }) {
     content: reply.content,
     created_at: toIso(reply.createdAt),
     user: serializeUser(reply.user),
+  }
+}
+
+export function serializeNotification(notification: Notification) {
+  return {
+    id: notification.id,
+    type: notification.type,
+    title: notification.title,
+    message: notification.message,
+    data: notification.data ?? null,
+    read_at: toIso(notification.readAt),
+    created_at: toIso(notification.createdAt),
   }
 }
 

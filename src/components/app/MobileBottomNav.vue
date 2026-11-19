@@ -1,9 +1,13 @@
 <script setup>
 import { onMounted, nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import feather from 'feather-icons';
+import { useNotificationStore } from '@/stores/notification';
 
 const route = useRoute();
+const notificationStore = useNotificationStore();
+const { unreadCount } = storeToRefs(notificationStore);
 
 // Render ulang ikon saat pengguna berpindah halaman
 watch(() => route.path, () => {
@@ -12,7 +16,7 @@ watch(() => route.path, () => {
     });
 });
 
-watch(route, () => {
+watch([route, unreadCount], () => {
     nextTick(() => {
         feather.replace();
     });
@@ -57,6 +61,19 @@ onMounted(() => {
                     }">
                     Buat Tiket
                 </span>
+            </RouterLink>
+
+            <RouterLink :to="{ name: 'app.notifications' }" 
+                class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-blue-600 transition-colors"
+                exact-active-class="!text-blue-600">
+                <div class="relative">
+                    <i data-feather="bell" class="w-6 h-6 mb-1"></i>
+                    <span v-if="unreadCount > 0"
+                        class="absolute -top-1 -right-2 min-w-[16px] h-[16px] px-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
+                        {{ unreadCount > 99 ? '99+' : unreadCount }}
+                    </span>
+                </div>
+                <span class="text-[10px] font-medium">Notifikasi</span>
             </RouterLink>
 
             <RouterLink :to="{ name: 'app.profile' }" 

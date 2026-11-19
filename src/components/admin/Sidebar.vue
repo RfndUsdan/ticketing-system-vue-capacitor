@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted, nextTick } from 'vue';
+import { onMounted, nextTick, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { useTicketStore } from '@/stores/ticket'; 
+import { useTicketStore } from '@/stores/ticket';
+import { useNotificationStore } from '@/stores/notification';
 import { storeToRefs } from 'pinia';
 import feather from 'feather-icons';
 
@@ -12,11 +13,19 @@ const { logout } = authStore;
 const ticketStore = useTicketStore();
 const { statistic } = storeToRefs(ticketStore);
 
+const notificationStore = useNotificationStore();
+const { unreadCount } = storeToRefs(notificationStore);
+
 const handleLogout = async () => {
     await logout();
 };
 
 onMounted(async () => {
+    await nextTick();
+    feather.replace();
+});
+
+watch(unreadCount, async () => {
     await nextTick();
     feather.replace();
 });
@@ -100,6 +109,25 @@ onMounted(async () => {
                         <i data-feather="file-text" class="w-5 h-5 mr-3"></i>
                     </span>
                     Laporan Rekap
+                </RouterLink>
+
+                <div class="pt-4 pb-1">
+                    <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Notifikasi</p>
+                </div>
+
+                <RouterLink :to="{ name: 'admin.notifications' }"
+                    class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
+                    :class="($route.name === 'admin.notifications') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'">
+                    <div class="flex items-center">
+                        <span :class="($route.name === 'admin.notifications') ? 'text-blue-600' : 'text-gray-400'">
+                            <i data-feather="bell" class="w-5 h-5 mr-3"></i>
+                        </span>
+                        Notifikasi
+                    </div>
+                    <span v-if="unreadCount > 0"
+                        class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                        {{ unreadCount > 99 ? '99+' : unreadCount }}
+                    </span>
                 </RouterLink>
 
             </nav>

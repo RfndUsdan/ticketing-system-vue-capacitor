@@ -6,6 +6,7 @@ import { prisma } from '../config/prisma.js'
 import { fail, success } from '../utils/response.js'
 import { serializeReply, serializeTicket } from '../utils/serializers.js'
 import { generateTicketCode } from '../utils/ticketCode.js'
+import { createNotification, notifyAdmins } from '../services/notification.js'
 import {
   listTicketsQuerySchema,
   type TicketListQuery,
@@ -398,7 +399,7 @@ export async function createReply(req: Request, res: Response): Promise<void> {
     const result = await prisma.$transaction(async (tx) => {
       const ticket = await tx.ticket.findFirst({
         where: { code, deletedAt: null },
-        select: { id: true, userId: true },
+        select: { id: true, userId: true, code: true, title: true, status: true },
       })
 
       if (!ticket) return { kind: 'not-found' as const }
@@ -411,6 +412,7 @@ export async function createReply(req: Request, res: Response): Promise<void> {
         include: { user: true },
       })
 
+      let statusChangedTo: string | null = null
       if (user.role === 'admin' && status) {
         await tx.ticket.update({
           where: { id: ticket.id },
@@ -419,9 +421,10 @@ export async function createReply(req: Request, res: Response): Promise<void> {
             ...(status === 'resolved' ? { completedAt: new Date() } : {}),
           },
         })
+        statusChangedTo = status
       }
 
-      return { kind: 'created' as const, reply }
+      return { kind: 'created' as const, reply, ticket, statusChangedTo }
     })
 
     if (result.kind === 'not-found') {
@@ -431,6 +434,38 @@ export async function createReply(req: Request, res: Response): Promise<void> {
     if (result.kind === 'forbidden') {
       res.status(403).json({ message: 'Anda tidak bisa membalas tiket ini' })
       return
+    }
+
+    // Kirim notifikasi in-app (best-effort, jangan gagalkan respons utama)
+    try {
+      const ticketCode = result.ticket.code
+      const ticketTitle = result.ticket.title
+      if (user.role === 'admin') {
+        // Admin membalas -> notifikasi ke pelapor tiket
+        if (result.ticket.userId !== user.id) {
+          const statusText = result.statusChangedTo ? ` Status tiket diperbarui menjadi ${result.statusChangedTo}.` : ''
+          await createNotification({
+            userId: result.ticket.userId,
+            type: result.statusChangedTo ? 'ticket_status' : 'ticket_reply',
+            title: `Update tiket #${ticketCode}`,
+            message: `Admin membalas tiket "${ticketTitle}".${statusText}`,
+            data: { ticket_code: ticketCode, status: result.statusChangedTo },
+          })
+        }
+      } else {
+        // User/pelapor membalas -> notifikasi ke admin
+        await notifyAdmins(
+          {
+            type: 'ticket_reply',
+            title: `Balasan baru pada tiket #${ticketCode}`,
+            message: `${user.name} membalas tiket "${ticketTitle}".`,
+            data: { ticket_code: ticketCode },
+          },
+          user.id,
+        )
+      }
+    } catch (notifError) {
+      console.error('Gagal membuat notifikasi:', notifError)
     }
 
     success(
