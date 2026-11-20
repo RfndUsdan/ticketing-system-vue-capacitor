@@ -42,7 +42,7 @@ export async function createNotificationsForUsers(userIds: number[], input: Omit
   const uniqueUserIds = Array.from(new Set(userIds)).filter(Boolean)
   if (uniqueUserIds.length === 0) return []
 
-  const created = await prisma.\(
+  const created = await prisma.$transaction(
     uniqueUserIds.map((userId) =>
       prisma.notification.create({
         data: {
