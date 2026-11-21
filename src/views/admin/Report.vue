@@ -1,15 +1,13 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue';
-import { useTicketStore } from '@/stores/ticket';
-import { storeToRefs } from 'pinia';
+import { axiosInstance } from '@/plugins/axios';
 import { DateTime } from 'luxon';
 import { capitalize } from 'lodash';
 import feather from 'feather-icons';
 import { showPopup } from '@/helpers/popup';
 
-const ticketStore = useTicketStore();
-const { tickets, loading } = storeToRefs(ticketStore);
-const { fetchTickets } = ticketStore;
+const tickets = ref([]);
+const loading = ref(false);
 
 const filters = ref({
     month: '', 
@@ -17,8 +15,37 @@ const filters = ref({
     status: '',
 });
 
+const fetchAllTickets = async () => {
+    loading.value = true;
+    try {
+        const perPage = 100;
+        let page = 1;
+        let lastPage = 1;
+        const all = [];
+
+        do {
+            const response = await axiosInstance.get('ticket', {
+                params: { page, per_page: perPage }
+            });
+            const data = response.data?.data || [];
+            const meta = response.data?.meta || null;
+            all.push(...data);
+            lastPage = meta?.last_page ?? page;
+            page += 1;
+        } while (page <= lastPage);
+
+        tickets.value = all;
+    } catch (error) {
+        console.error('Gagal memuat data tiket untuk laporan:', error);
+        showPopup('Gagal memuat data tiket untuk laporan.', 'error');
+        tickets.value = [];
+    } finally {
+        loading.value = false;
+    }
+};
+
 onMounted(async () => {
-    await fetchTickets();
+    await fetchAllTickets();
     await nextTick();
     feather.replace();
 });
@@ -153,7 +180,8 @@ const printPDF = () => {
                 </span>
             </div>
 
-            <div class="overflow-x-auto">
+            <div v-if="loading" class="py-10 text-center text-sm text-gray-500 print:hidden">Memuat data laporan...</div>
+            <div class="overflow-x-auto" v-else>
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-200 print:bg-gray-100 print:border-gray-800">
@@ -169,7 +197,7 @@ const printPDF = () => {
                     </thead>
                     <tbody class="divide-y divide-gray-100 print:divide-gray-300">
                         <tr v-if="filteredTickets.length === 0">
-                            <td colSpan="8" class="py-8 text-center text-sm text-gray-400">
+                            <td colspan="8" class="py-8 text-center text-sm text-gray-400">
                                 Tidak ada laporan yang sesuai dengan filter yang dipilih.
                             </td>
                         </tr>

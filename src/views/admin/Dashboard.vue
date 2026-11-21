@@ -45,7 +45,7 @@ watch(statistic, () => {
 }, {deep: true })
 
 onMounted(async () => {
-    await fetchTickets()
+    await fetchTickets({ page: 1, per_page: 5 })
     await fetchStatistics()
 
     const statusCtx = document.getElementById('statusChart')?.getContext('2d')
@@ -170,8 +170,8 @@ onMounted(async () => {
             <div class="p-6 border-b border-gray-100">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-semibold text-gray-800">Tiket Terbaru</h3>
-                    <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Lihat
-                        Semua</a>
+                    <RouterLink :to="{ name: 'admin.ticket' }" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Lihat
+                        Semua</RouterLink>
                 </div>
             </div>
             <div class="divide-y divide-gray-100">

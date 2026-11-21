@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch, nextTick } from 'vue'; 
+import { onMounted, ref, watch, nextTick, computed } from 'vue'; 
 import { useTicketStore } from '@/stores/ticket';
 import { storeToRefs } from 'pinia';
 import { capitalize, debounce } from 'lodash';
@@ -10,7 +10,7 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter(); 
 const ticketStore = useTicketStore()
-const { tickets } = storeToRefs(ticketStore)
+const { tickets, ticketPagination, loading, error } = storeToRefs(ticketStore)
 const { fetchTickets } = ticketStore
 const goToDetail = (code) => {
     router.push({ name: 'admin.ticket.detail', params: { code: code } });
@@ -22,18 +22,38 @@ const filters = ref({
     priority: '',
     date: '',
 })
+const page = ref(1)
+const perPage = ref(10)
+const lastPage = computed(() => ticketPagination.value?.last_page ?? 1)
+const totalTickets = computed(() => ticketPagination.value?.total ?? 0)
 
-watch(() => route.query.status, async (newStatus) => {
-    filters.value.status = newStatus || '';
-    await fetchTickets(filters.value);
+const loadTickets = () => fetchTickets({
+    ...filters.value,
+    page: page.value,
+    per_page: perPage.value,
+})
+
+const debouncedLoadTickets = debounce(() => {
+    loadTickets()
+}, 300)
+
+watch(() => route.query.status, (newStatus) => {
+    const next = newStatus || ''
+    if (filters.value.status === next) return
+    filters.value.status = next
 });
 
-watch(filters, debounce(async () => {
-    await fetchTickets(filters.value)
-}, 300), { deep: true})
+watch(filters, () => {
+    page.value = 1
+    debouncedLoadTickets()
+}, { deep: true })
+
+watch([page, perPage], () => {
+    loadTickets()
+})
 
 onMounted(async () => {
-    await fetchTickets(filters.value)
+    await loadTickets()
 
     await nextTick()
     feather.replace()
@@ -108,7 +128,18 @@ onMounted(async () => {
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100">
-                        <tr v-for="ticket in tickets" :key="ticket.code" class="hover:bg-gray-50"
+                        <tr v-if="loading">
+                            <td colspan="9" class="px-6 py-10 text-center text-sm text-gray-500">Memuat tiket...</td>
+                        </tr>
+                        <tr v-else-if="error">
+                            <td colspan="9" class="px-6 py-10 text-center text-sm text-red-600">
+                                {{ typeof error === 'string' ? error : 'Tiket gagal dimuat. Silakan coba lagi.' }}
+                            </td>
+                        </tr>
+                        <tr v-else-if="tickets.length === 0">
+                            <td colspan="9" class="px-6 py-10 text-center text-sm text-gray-500">Tidak ada tiket yang sesuai dengan filter.</td>
+                        </tr>
+                        <tr v-else v-for="ticket in tickets" :key="ticket.code" class="hover:bg-gray-50 cursor-pointer"
                         @click="goToDetail(ticket.code)">
                             
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
@@ -132,7 +163,7 @@ onMounted(async () => {
                                     <span class="ml-3 text-sm font-medium text-gray-800">{{ ticket.user?.name || 'Anonim' }}</span>
                                 </div>
                             </td>
-                                                        <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-3 py-1 text-xs font-medium rounded-full" :class="{
                                     'text-blue-700 bg-blue-100': ticket.status === 'open',
                                     'text-yellow-700 bg-yellow-100': ticket.status === 'in_progress',
@@ -173,6 +204,29 @@ onMounted(async () => {
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div v-if="totalTickets > 0" class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-gray-100 px-6 py-4">
+                <p class="text-sm text-gray-500">
+                    Halaman {{ ticketPagination?.current_page ?? page }} dari {{ lastPage }} · {{ totalTickets }} tiket
+                </p>
+                <div class="flex items-center gap-3">
+                    <label for="admin-tickets-per-page" class="text-sm text-gray-600">Per halaman</label>
+                    <select id="admin-tickets-per-page" v-model.number="perPage"
+                        class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+                        <option :value="10">10</option>
+                        <option :value="20">20</option>
+                        <option :value="50">50</option>
+                    </select>
+                    <button type="button" @click="page--" :disabled="page <= 1 || loading"
+                        class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                        Sebelumnya
+                    </button>
+                    <button type="button" @click="page++" :disabled="page >= lastPage || loading"
+                        class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                        Berikutnya
+                    </button>
+                </div>
             </div>
         </div>
     </div>
