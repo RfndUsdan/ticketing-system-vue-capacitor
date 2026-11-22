@@ -14,7 +14,7 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/validators.test.ts",
-    "test:integration": "node --import tsx --test tests/integration.test.ts",
+    "test:integration": "node --import tsx --test tests/integration.test.ts tests/integration.flows.test.ts",
     "test:typecheck": "tsc --noEmit -p tsconfig.test.json",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
