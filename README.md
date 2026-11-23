@@ -296,6 +296,14 @@ Keberhasilan tidak hanya ditentukan oleh tampilan Android. Backend perlu dapat d
 
 ---
 
+## Dokumentasi Teknis / Operasional
+
+> README ini dipertahankan sebagai **dokumen akademik** (Tugas 1: analisis kebutuhan & karakteristik perangkat bergerak). Untuk panduan teknis/devops/deploy, gunakan:
+> - [`docs/OPERASIONAL.md`](docs/OPERASIONAL.md) - setup environment, migrasi/seed, storage, build Android/Capacitor, deploy, troubleshooting.
+> - [`docs/PENGUJIAN.md`](docs/PENGUJIAN.md) - skenario pengujian notifikasi, multi-gambar, duplikat/batas/rate limit, dan verifikasi.
+
+---
+
 ## Checklist Sebelum Pengumpulan
 
 - [ ] Isi nama, NIM, mata kuliah, dan identitas kampus.
