@@ -39,3 +39,20 @@ export const loginLimit = rateLimit({
     return `${ipKeyGenerator(req.ip ?? '')}:account:${email}`
   },
 })
+
+export const passwordResetRequestLimit = rateLimit({
+  windowMs: 15 * 60_000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Terlalu banyak permintaan reset password. Coba lagi nanti.' },
+  keyGenerator: (req) => {
+    const email = typeof req.body?.email === 'string'
+      ? req.body.email.trim().toLowerCase().slice(0, 255)
+      : 'unknown'
+    return `${ipKeyGenerator(req.ip ?? '')}:account:${email}`
+  },
+})
+
+export const passwordResetVerifyLimit = endpointLimit(30)
+

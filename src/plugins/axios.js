@@ -31,7 +31,10 @@ axiosInstance.interceptors.response.use(
         const status = error.response?.status
         const requestPath = String(error.config?.url || '').replace(/\/+$/, '')
         const isPublicAuthRequest =
-            requestPath.endsWith('/login') || requestPath.endsWith('/register')
+            requestPath.endsWith('/login') ||
+            requestPath.endsWith('/register') ||
+            requestPath.endsWith('/forgot-password') ||
+            requestPath.includes('/reset-password')
 
         // A failed login/register is form feedback, not an expired session.
         if (status === 401 && !isPublicAuthRequest) {

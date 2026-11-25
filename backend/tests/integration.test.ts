@@ -178,6 +178,36 @@ test('API persists tickets, images, replies and status, and enforces ticket owne
     assert.equal(updatedDetail.status, 200)
     assert.equal(updatedDetail.body.data.status, 'in_progress')
     assert.ok(updatedDetail.body.data.ticket_replies.some((item: { content: string }) => item.content === 'Petugas sedang menindaklanjuti.'))
+
+    const forgot = await request('/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    assert.equal(forgot.status, 200, forgot.body.message ?? 'Permintaan reset gagal')
+    const devResetUrl = forgot.body.data?.dev_reset_url as string | undefined
+    assert.ok(devResetUrl, 'mode test mengembalikan tautan reset untuk pengujian')
+    const resetToken = new URL(devResetUrl!).pathname.split('/').pop() ?? ''
+
+    const checkToken = await request(`/reset-password/${resetToken}`)
+    assert.equal(checkToken.status, 200, checkToken.body.message ?? 'Validasi token gagal')
+    assert.equal(checkToken.body.data.valid, true)
+
+    const newPassword = 'NewTestPass123!'
+    const reset = await request('/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: resetToken,
+        password: newPassword,
+        password_confirmation: newPassword,
+      }),
+    })
+    assert.equal(reset.status, 200, reset.body.message ?? 'Reset password gagal')
+    await login(email, newPassword)
+
+    const reusedToken = await request(`/reset-password/${resetToken}`)
+    assert.equal(reusedToken.status, 410)
   } finally {
     if (server) {
       server.close()

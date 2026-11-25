@@ -6,7 +6,8 @@ REST API untuk aplikasi **Apa Kabar** menggunakan **Node.js + Express 5 + TypeSc
 > Frontend Vue menggunakan `VITE_API_BASE_URL` untuk mengakses backend ini; konfigurasi Android/Capacitor
 > belum diubah. Endpoint yang berfungsi:
 > `GET /api/health`, `POST /api/register` (termasuk avatar), `POST /api/login`, `GET /api/me`,
-> `POST /api/logout`, serta list/detail/create tiket dengan auth, ownership, filter, dan pagination opsional.
+> `POST /api/logout`, alur lupa password (`POST /api/forgot-password`, `GET /api/reset-password/:token`,
+> `POST /api/reset-password`), serta list/detail/create tiket dengan auth, ownership, filter, dan pagination opsional.
 > Seluruh route tiket, user, profil, dan dashboard pada tabel endpoint sudah memiliki implementasi.
 
 ---
@@ -247,6 +248,38 @@ dan `meta.total`.
 
 ---
 
+## Alur lupa password
+
+Endpoint yang tersedia:
+
+| Method | Endpoint | Kegunaan |
+|---|---|---|
+| `POST` | `/api/forgot-password` | Menerima `{ email }`, membuat token reset sekali pakai. |
+| `GET` | `/api/reset-password/:token` |Memeriksa apakah token masih valid. |
+| `POST` | `/api/reset-password` | Mengirim `{ token, password, password_confirmation }` untuk mengganti password. |
+
+Token disimpan sebagai hash SHA-256 di tabel `password_reset_tokens`, berlaku 30 menit secara
+default, dan tidak dapat dipakai dua kali. Permintaan baru akan menonaktifkan token lama milik
+pengguna yang sama. Respons `forgot-password` sengaja sama untuk email terdaftar maupun tidak.
+
+Konfigurasi email:
+
+- `FRONTEND_URL`: base URL halaman reset, mis. `http://localhost:5173`.
+- `PASSWORD_RESET_TTL_MINUTES`: masa berlaku token dalam menit.
+- `PASSWORD_RESET_EMAIL_URL`: webhook HTTP yang menerima
+  `{ "to", "subject", "text", "html" }`. Jika `PASSWORD_RESET_EMAIL_TOKEN` diisi, header
+  `Authorization: Bearer ...` ikut dikirim.
+- Jika webhook belum dikonfigurasi, mode development mengembalikan `dev_reset_url` pada respons
+  agar alur bisa diuji tanpa email. Di production, konfigurasi email wajib diisi.
+
+Jalankan migration setelah menarik perubahan ini:
+
+```bash
+npm run prisma:deploy --workspace @apakabar/api
+```
+
+---
+
 ## Konfigurasi frontend
 
 `src/plugins/axios.js` membaca `VITE_API_BASE_URL`; contoh ada di root `.env.example`.
@@ -263,6 +296,6 @@ berfungsi. Konfigurasi Capacitor belum diubah.
 - [ ] Gunakan HTTPS dan jangan aktifkan cleartext traffic di Android release.
 - [ ] Pindahkan upload ke S3/R2 dan batasi akses file.
 - [ ] Tambahkan refresh token/denylist jika butuh revoke sesi.
-- [ ] Tambahkan rate limit khusus login/register.
-- [ ] Tambahkan test otomatis dan CI.
+- [ ] Tambahkan rate limit khusus register (login dan reset sudah memiliki limit sendiri).
+- [x] Tambahkan test otomatis dan CI.
 - [ ] Ganti `console.error` dengan logger terstruktur.

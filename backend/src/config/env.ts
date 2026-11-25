@@ -15,6 +15,16 @@ const envSchema = z.object({
     .default('http://localhost:8000'),
   AVATAR_MAX_UPLOAD_MB: z.coerce.number().positive().default(2),
   TICKET_IMAGE_MAX_UPLOAD_MB: z.coerce.number().positive().default(10),
+  FRONTEND_URL: z
+    .string()
+    .regex(/^https?:\/\/.+/, 'FRONTEND_URL harus diawali http:// atau https://')
+    .default('http://localhost:5173'),
+  PASSWORD_RESET_TTL_MINUTES: z.coerce.number().int().min(5).max(1440).default(30),
+  PASSWORD_RESET_EMAIL_URL: z
+    .string()
+    .regex(/^https?:\/\/.+/, 'PASSWORD_RESET_EMAIL_URL harus diawali http:// atau https://')
+    .optional(),
+  PASSWORD_RESET_EMAIL_TOKEN: z.string().optional(),
 })
 
 const parsed = envSchema.safeParse(process.env)
