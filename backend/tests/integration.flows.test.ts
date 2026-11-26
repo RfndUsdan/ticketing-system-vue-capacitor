@@ -364,3 +364,116 @@ test('API critical flows: auth, multi-image ticket, duplicate/idempotency, reply
     await prisma.$disconnect()
   }
 })
+
+test('API critical flows: daily limit, notification ownership, admin delete ticket', async () => {
+  const databaseUrl = process.env.DATABASE_URL
+  const databaseName = databaseUrl ? new URL(databaseUrl).pathname.slice(1) : ''
+  if (!/(^|[-_])test($|[-_])/i.test(databaseName)) {
+    throw new Error('Integration test dibatalkan: DATABASE_URL harus mengarah ke database khusus dengan nama berakhiran _test.')
+  }
+
+  const [{ default: app }, { prisma }] = await Promise.all([
+    import('../src/app.js'),
+    import('../src/config/prisma.js'),
+  ])
+
+  const suffix = randomUUID().replaceAll('-', '')
+  let server: ReturnType<typeof app.listen> | undefined
+  const createdTicketIds: number[] = []
+  const createdUserIds: number[] = []
+
+  try {
+    server = app.listen(0)
+    await once(server, 'listening')
+    const address = server.address()
+    assert.ok(address && typeof address !== 'string')
+    const baseUrl = `http://127.0.0.1:${address.port}/api`
+
+    const request = async (endpoint: string, options: RequestInit = {}): Promise<ApiResponse> => {
+      const response = await fetch(`${baseUrl}${endpoint}`, options)
+      return { status: response.status, body: await response.json() as ApiResponse['body'] }
+    }
+
+    const userPass = 'TestPass123!'
+    const reg = await request('/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Limit User', email: `limit-${suffix}@example.test`, nim: `L${suffix.slice(0, 19)}`, password: userPass }),
+    })
+    assert.equal(reg.status, 201)
+    createdUserIds.push(reg.body.data.user.id)
+    const userToken = reg.body.data.token as string
+
+    const reg2 = await request('/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Other User', email: `other2-${suffix}@example.test`, nim: `M${suffix.slice(0, 19)}`, password: userPass }),
+    })
+    assert.equal(reg2.status, 201)
+    createdUserIds.push(reg2.body.data.user.id)
+    const otherToken = reg2.body.data.token as string
+
+    const bcrypt = await import('bcryptjs')
+    const admin = await prisma.user.create({
+      data: { name: 'Admin', email: `admin2-${suffix}@example.test`, password: await bcrypt.hash('AdminTest123!', 4), role: 'admin' },
+    })
+    createdUserIds.push(admin.id)
+    const adminLogin = await request('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: admin.email, password: 'AdminTest123!' }) })
+    assert.equal(adminLogin.status, 200)
+    const adminToken = adminLogin.body.data.token as string
+
+    // daily limit: seed 5 tickets today for user
+    const dayStart = new Date()
+    dayStart.setUTCHours(0, 0, 0, 0)
+    for (let i = 0; i < 5; i++) {
+      const t = await prisma.ticket.create({
+        data: {
+          code: `DL-${suffix.slice(0, 6)}-${i}`,
+          userId: reg.body.data.user.id,
+          title: `Daily ${i}`, category: 'Fasilitas', location: 'X', priority: 'low', description: 'd', status: 'open',
+          createdAt: new Date(dayStart.getTime() + i * 60000),
+        },
+      })
+      createdTicketIds.push(t.id)
+    }
+    const overLimitForm = new FormData()
+    overLimitForm.set('title', 'Over limit')
+    overLimitForm.set('category', 'Fasilitas')
+    overLimitForm.set('location', 'X')
+    overLimitForm.set('priority', 'low')
+    overLimitForm.set('description', 'should fail daily limit')
+    const overLimit = await request('/ticket', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${userToken}`, 'Idempotency-Key': randomUUID() },
+      body: overLimitForm,
+    })
+    assert.equal(overLimit.status, 429)
+
+    // notification ownership
+    const notif = await prisma.notification.create({
+      data: { userId: reg.body.data.user.id, type: 'test', title: 't', message: 'm', data: { ticket_code: 'X' } },
+    })
+    const otherRead = await request(`/notifications/${notif.id}/read`, { method: 'PATCH', headers: { Authorization: `Bearer ${otherToken}` } })
+    assert.equal(otherRead.status, 404)
+    await prisma.notification.delete({ where: { id: notif.id } })
+
+    // admin delete ticket
+    const ticket = await prisma.ticket.create({
+      data: { code: `DEL-${suffix.slice(0, 8)}`, userId: reg.body.data.user.id, title: 'To delete', category: 'Fasilitas', location: 'Y', priority: 'low', description: 'd', status: 'open' },
+    })
+    createdTicketIds.push(ticket.id)
+    const del = await request(`/ticket/${ticket.code}`, { method: 'DELETE', headers: { Authorization: `Bearer ${adminToken}` } })
+    assert.equal(del.status, 200)
+  } finally {
+    if (server) { server.close(); await once(server, 'close') }
+    if (createdTicketIds.length) {
+      await prisma.notification.deleteMany({ where: { userId: { in: createdUserIds } } })
+      await prisma.ticketReply.deleteMany({ where: { ticketId: { in: createdTicketIds } } })
+      await prisma.ticketImage.deleteMany({ where: { ticketId: { in: createdTicketIds } } })
+      await prisma.ticket.deleteMany({ where: { id: { in: createdTicketIds } } })
+    }
+    if (createdUserIds.length) {
+      await prisma.notification.deleteMany({ where: { userId: { in: createdUserIds } } })
+      await prisma.user.deleteMany({ where: { id: { in: createdUserIds } } })
+    }
+    await prisma.$disconnect()
+  }
+})
